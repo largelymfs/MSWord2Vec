@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelymfs
-* @Last Modified time: 2015-02-18 15:10:46
+* @Last Modified time: 2015-02-19 14:59:50
 */
 
 #include <iostream>
@@ -21,6 +21,9 @@ HashMap::HashMap(): hash_size(30000007){
 	this->word_number = 0;
 }
 HashMap::~HashMap(){
+	//delete all the content's words
+	for (int i = 0; i < this->hash_size; i++)
+		if (this->content[i].cnt!=0) delete[] this->content[i].word;
 	delete[] this->content;
 }
 long long HashMap::Hash(char* word){
@@ -77,6 +80,8 @@ void HashMap::show(){
 		}
 	}
 }
+
+
 using namespace std;
 
 
@@ -90,7 +95,6 @@ int main(){
 	h->addWord(t);
 	h->addWord(t);
 	h->show();
-	std::cout << h->searchWordIndex(s) << std::endl;
-	delete h;
+	delete h;	
     return 0;
 }
