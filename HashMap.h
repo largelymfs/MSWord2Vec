@@ -17,6 +17,7 @@ public:
 	long long searchWord(char* word);
 	long long searchWordIndex(char* word);
 	void show();
+	void reduce_vocab(int min_count);
 private:
 	Node* content;
 	const int hash_size;

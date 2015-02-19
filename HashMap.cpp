@@ -2,11 +2,32 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelymfs
-* @Last Modified time: 2015-02-19 14:59:50
+* @Last Modified time: 2015-02-19 21:36:36
 */
 
 #include <iostream>
 #include "HashMap.h"
+
+void sortlist(std::vector<std::string>& strlist, std::vector<int>& cntlist, int l, int r){
+	int i, j, xcnt, mid, tmpcnt;
+	std::string xstr, tmpstr;
+	i = l;
+	j = r;
+	mid = (i + j) >> 1;
+	xcnt = cntlist[mid];
+	xstr = strlist[mid];
+	while (i <= j){
+		while ((i <= j) && (xcnt >= cntlist[i])) i++;
+		while ((i <= j) && (xcnt <= cntlist[j])) j--;
+		if (i <= j){
+			tmpcnt = cntlist[i];cntlist[i] = cntlist[j];cntlist[j] = tmpcnt;
+			tmpstr = strlist[i];strlist[i] = strlist[j];strlist[j] = tmpstr;
+			i++;j--;
+		}
+	}
+	if (l < j) sortlist(strlist, cntlist, l, j);
+	if (i < r) sortlist(strlist, cntlist, i, r);
+}
 
 void Node::setWord(char* word){
 	int l = strlen(word);
@@ -72,6 +93,7 @@ void HashMap::addWord(char *word){
 		if (res==this->hash_size) res = 0;
 	}
 }
+
 void HashMap::show(){
 	std::cout << "\t\tindex\t\tcount\t\twordindex\t\tword" << std::endl;
 	for (int i = 0; i < this->hash_size; i++){
@@ -81,6 +103,23 @@ void HashMap::show(){
 	}
 }
 
+void HashMap::reduce_vocab(int min_count){
+	std::vector<std::string> strlist;
+	std::vector<int> cntlist;
+
+	for (int i = 0; i < this->hash_size; i++){
+		if (this->content[i].cnt != 0 && this->content[i].cnt > min_count){
+			strlist.push_back(std::string(this->content[i].word));
+			cntlist.push_back(this->content[i].cnt);
+		}
+	}
+
+	int l = strlist.size();
+	sortlist(strlist, cntlist, 0, l-1);
+	delete this->content;
+	this->content = new Node[this->hash_size];
+	this->word_number = 0;
+}
 
 using namespace std;
 
