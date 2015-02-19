@@ -5,17 +5,17 @@ struct Node{
 	long long cnt, index;
 	char* word;
 	Node():cnt(0){}
-	void setWord(char* w);
+	void setWord(const char* w, int cnt);
 };
 
 class HashMap{
 public:
 	HashMap();
 	~HashMap();
-	void addWord(char* word);
-	long long Hash(char* word);
-	long long searchWord(char* word);
-	long long searchWordIndex(char* word);
+	void addWord(const char* word, int cnt);
+	long long Hash(const char* word);
+	long long searchWord(const char* word);
+	long long searchWordIndex(const char* word);
 	void show();
 	void reduce_vocab(int min_count);
 private:
