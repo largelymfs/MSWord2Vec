@@ -1,8 +1,8 @@
 /* 
 * @Author: largelymfs
 * @Date:   2015-02-18 15:23:16
-* @Last Modified by:   largelymfs
-* @Last Modified time: 2015-02-19 13:54:07
+* @Last Modified by:   largelyfs
+* @Last Modified time: 2015-02-20 21:24:14
 */
 
 #include <iostream>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-FileReader::FileReader(const char* filename):MAX_STRING(100){
+FileReader::FileReader(const char* filename, int max_string):MAX_STRING(max_string){
 	this->filename = new char[this->MAX_STRING];
 	strcpy(this->filename, filename);
 	this->fin = fopen(this->filename, "rb");
@@ -50,7 +50,7 @@ bool FileReader::hasWord(){
 
 int main(){
 	char s[10]="test.txt";
-	FileReader *f = new FileReader(s);
+	FileReader *f = new FileReader(s, 100);
 	char word[100];
 	while (f->hasWord()){
 		f->getWord(word);

@@ -3,7 +3,7 @@
 
 class FileReader{
 public:
-	FileReader(const char* filename);
+	FileReader(const char* filename, int max_string);
 	~FileReader();
 	bool hasWord();
 	void getWord(char* word);
