@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-20 21:40:34
+* @Last Modified time: 2015-02-20 21:43:24
 */
 
 #include <iostream>
@@ -119,7 +119,7 @@ void HashMap::reduce_vocab(int min_count){
 
 	int l = strlist.size();
 	sortlist(strlist, cntlist, 0, l-1);
-	delete this->content;
+	delete[] this->content;
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
 	for (int i = 0; i < l; i++)
@@ -135,13 +135,13 @@ int main(){
 	h->addWord(s, 1);
 	h->addWord(s, 1);
 	std::cout << "BEGIN" << std::endl;
-	// h->addWord(s, 1);
-	// char t[11] = "largelymfs";
-	// h->addWord(t, 1);
-	// h->addWord(t, 1);
-	//h->show();
-	// h->reduce_vocab(2);
-	// h->show();
+	h->addWord(s, 1);
+	char t[11] = "largelymfs";
+	h->addWord(t, 1);
+	h->addWord(t, 1);
+	h->show();
+	h->reduce_vocab(2);
+	h->show();
 	delete h;	
     return 0;
 }
