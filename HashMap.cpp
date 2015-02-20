@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-20 17:16:47
+* @Last Modified time: 2015-02-20 21:40:34
 */
 
 #include <iostream>
@@ -60,11 +60,11 @@ long long HashMap::Hash(const char* word){
 }
 long long HashMap::searchWord(const char *word){
 	long long res = this->Hash(word);
-	Node tmp;
+	Node *tmp;
 	while (true){		
-		tmp = this->content[res];
-		if (tmp.cnt==0) return -1;
-		if (strcmp(tmp.word, word)==0) return res;
+		tmp = &(this->content[res]);
+		if (tmp->cnt==0) return -1;
+		if (strcmp(tmp->word, word)==0) return res;
 		res++;
 		if (res==this->hash_size) res = 0;
 	}
@@ -76,18 +76,19 @@ long long HashMap::searchWordIndex(const char* word){
 }
 void HashMap::addWord(const char *word, int cnt){
 	long long res = this->Hash(word);
-	Node tmp;
+	Node *tmp;
 	if (this->word_number >= this->hash_size) return;
+
 	while (true){
-		tmp = this->content[res];
-		if (tmp.cnt==0){
+		tmp = &(this->content[res]);
+		if (tmp->cnt==0){
 			this->content[res].setWord(word, cnt);
 			this->content[res].index = this->word_number;
 			this->word_number++;
 			return;
 		}
-		if (strcmp(tmp.word, word)==0){
-			this->content[res].cnt++;
+		if (strcmp(tmp->word, word)==0){
+			this->content[res].cnt+=cnt;
 			return;
 		}
 		res++;
@@ -132,12 +133,13 @@ int main(){
 	HashMap *h = new HashMap();
 	char s[10]="hellolibo";
 	h->addWord(s, 1);
-	//h->addWord(s, 1);
-	//h->addWord(s, 1);
+	h->addWord(s, 1);
+	std::cout << "BEGIN" << std::endl;
+	// h->addWord(s, 1);
 	// char t[11] = "largelymfs";
 	// h->addWord(t, 1);
 	// h->addWord(t, 1);
-	// h->show();
+	//h->show();
 	// h->reduce_vocab(2);
 	// h->show();
 	delete h;	
