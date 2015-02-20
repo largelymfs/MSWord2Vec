@@ -4,7 +4,11 @@
 struct Node{
 	long long cnt, index;
 	char* word;
-	Node():cnt(0){}
+	Node():cnt(0),word(NULL){}
+	~Node(){
+		if (word!=NULL) delete word;
+	}
+
 	void setWord(const char* w, int cnt);
 };
 

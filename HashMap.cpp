@@ -1,8 +1,8 @@
 /* 
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
-* @Last Modified by:   largelymfs
-* @Last Modified time: 2015-02-19 23:41:00
+* @Last Modified by:   largelyfs
+* @Last Modified time: 2015-02-20 17:16:47
 */
 
 #include <iostream>
@@ -43,8 +43,10 @@ HashMap::HashMap(): hash_size(30000007){
 }
 HashMap::~HashMap(){
 	//delete all the content's words
-	for (int i = 0; i < this->hash_size; i++)
-		if (this->content[i].cnt!=0) delete[] this->content[i].word;
+	// for (int i = 0; i < this->hash_size; i++){
+	// 	if (this->content[i].cnt!=0) std::cout << this->content[i].word << std::endl;
+	// 	//if (this->content[i].cnt!=0) delete[] this->content[i].word;
+	// }
 	delete[] this->content;
 }
 long long HashMap::Hash(const char* word){
@@ -76,7 +78,6 @@ void HashMap::addWord(const char *word, int cnt){
 	long long res = this->Hash(word);
 	Node tmp;
 	if (this->word_number >= this->hash_size) return;
-
 	while (true){
 		tmp = this->content[res];
 		if (tmp.cnt==0){
@@ -131,14 +132,14 @@ int main(){
 	HashMap *h = new HashMap();
 	char s[10]="hellolibo";
 	h->addWord(s, 1);
-	h->addWord(s, 1);
-	h->addWord(s, 1);
-	char t[11] = "largelymfs";
-	h->addWord(t, 1);
-	h->addWord(t, 1);
-	h->show();
-	h->reduce_vocab(2);
-	h->show();
+	//h->addWord(s, 1);
+	//h->addWord(s, 1);
+	// char t[11] = "largelymfs";
+	// h->addWord(t, 1);
+	// h->addWord(t, 1);
+	// h->show();
+	// h->reduce_vocab(2);
+	// h->show();
 	delete h;	
     return 0;
 }
