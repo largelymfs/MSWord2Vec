@@ -9,6 +9,7 @@ struct Node{
 		if (word!=NULL) delete word;
 	}
 
+	void setWord(char* w, int cnt);
 	void setWord(const char* w, int cnt);
 };
 
@@ -16,15 +17,17 @@ class HashMap{
 public:
 	HashMap();
 	~HashMap();
+	void addWord( char* word, int cnt);
 	void addWord(const char* word, int cnt);
+	long long Hash( char* word);
 	long long Hash(const char* word);
-	long long searchWord(const char* word);
-	long long searchWordIndex(const char* word);
+	long long searchWord( char* word);
+	long long searchWordIndex( char* word);
 	void show();
 	void reduce_vocab(int min_count);
 private:
 	Node* content;
-	const int hash_size;
+	 int hash_size;
 	long long word_number;
 };
 #endif
