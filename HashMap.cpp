@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-20 22:10:46
+* @Last Modified time: 2015-02-20 22:53:34
 */
 
 #include <iostream>
@@ -17,8 +17,8 @@ void sortlist(std::vector<std::string>& strlist, std::vector<int>& cntlist, int 
 	xcnt = cntlist[mid];
 	xstr = strlist[mid];
 	while (i <= j){
-		while ((i <= j) && (xcnt >= cntlist[i])) i++;
-		while ((i <= j) && (xcnt <= cntlist[j])) j--;
+		while ((i <= j) && (xcnt < cntlist[i])) i++;
+		while ((i <= j) && (xcnt > cntlist[j])) j--;
 		if (i <= j){
 			tmpcnt = cntlist[i];cntlist[i] = cntlist[j];cntlist[j] = tmpcnt;
 			tmpstr = strlist[i];strlist[i] = strlist[j];strlist[j] = tmpstr;
@@ -144,7 +144,6 @@ void HashMap::show(){
 void HashMap::reduce_vocab(int min_count){
 	std::vector<std::string> strlist;
 	std::vector<int> cntlist;
-
 	for (int i = 0; i < this->hash_size; i++){
 		if (this->content[i].cnt != 0 && this->content[i].cnt > min_count){
 			strlist.push_back(std::string(this->content[i].word));
@@ -153,12 +152,15 @@ void HashMap::reduce_vocab(int min_count){
 	}
 
 	int l = strlist.size();
+
 	sortlist(strlist, cntlist, 0, l-1);
-	delete[] this->content;
+	Node* old_content = this->content;
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
 	for (int i = 0; i < l; i++)
 		this->addWord(strlist[i].c_str(), cntlist[i]);
+
+	delete[] old_content;
 }
 
 using namespace std;

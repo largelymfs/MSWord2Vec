@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 15:23:16
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-20 21:24:14
+* @Last Modified time: 2015-02-20 21:28:42
 */
 
 #include <iostream>
@@ -48,14 +48,14 @@ bool FileReader::hasWord(){
 	return true;
 }
 
-int main(){
-	char s[10]="test.txt";
-	FileReader *f = new FileReader(s, 100);
-	char word[100];
-	while (f->hasWord()){
-		f->getWord(word);
-		std::cout << word << std::endl;
-	}
-	delete f;
-    return 0;
-}
+// int main(){
+// 	char s[10]="test.txt";
+// 	FileReader *f = new FileReader(s, 100);
+// 	char word[100];
+// 	while (f->hasWord()){
+// 		f->getWord(word);
+// 		std::cout << word << std::endl;
+// 	}
+// 	delete f;
+//     return 0;
+// }
