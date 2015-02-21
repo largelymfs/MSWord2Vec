@@ -4,6 +4,7 @@
 
 #include "HashMap.h"
 #include "FileReader.h"
+#include "stdio.h"
 
 class VocabGen{
 public:

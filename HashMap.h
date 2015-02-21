@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <stdlib.h>
+#include <stdio.h>
+
 struct Node{
 	long long cnt, index;
 	char* word;
