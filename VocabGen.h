@@ -13,6 +13,7 @@ public:
 	void reduceVocab(int min_count);
 	long long searchWord(char* word);
 	~VocabGen();
+	long long size();
 private:
 	FileReader *f;
 	HashMap *h;

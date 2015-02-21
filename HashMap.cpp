@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-20 22:53:34
+* @Last Modified time: 2015-02-21 20:15:46
 */
 
 #include <iostream>
@@ -161,6 +161,10 @@ void HashMap::reduce_vocab(int min_count){
 		this->addWord(strlist[i].c_str(), cntlist[i]);
 
 	delete[] old_content;
+}
+
+long long HashMap::size(){
+	return this->word_number;
 }
 
 using namespace std;

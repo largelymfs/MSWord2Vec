@@ -29,9 +29,10 @@ public:
 	long long searchWordIndex( char* word);
 	void show();
 	void reduce_vocab(int min_count);
+	long long size();
 private:
 	Node* content;
-	 int hash_size;
+	int hash_size;
 	long long word_number;
 };
 #endif

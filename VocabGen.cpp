@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-20 21:14:18
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-21 13:43:29
+* @Last Modified time: 2015-02-21 20:18:04
 */
 
 #include <iostream>
@@ -35,6 +35,9 @@ long long VocabGen::searchWord(char* word){
 	return this->h->searchWordIndex(word);
 }
 
+long long VocabGen::size(){
+	return this->h->size();
+}
 
 using namespace std;
 
@@ -44,6 +47,7 @@ int main(){
 	g->reduceVocab(0);
 	char s[2] = "I";
 	std::cout << g->searchWord(s) << std::endl;
+	std::cout << g->size() << std::endl;
 	delete g;
     return 0;
 }
