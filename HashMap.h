@@ -2,6 +2,7 @@
 #define HASHMAP_H
 #include <vector>
 #include <string>
+#include <stdlib>
 struct Node{
 	long long cnt, index;
 	char* word;
