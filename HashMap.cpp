@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-21 20:15:46
+* @Last Modified time: 2015-02-21 22:35:41
 */
 
 #include <iostream>
@@ -152,7 +152,12 @@ void HashMap::reduce_vocab(int min_count){
 	}
 
 	int l = strlist.size();
-
+	if (l==0){
+		delete[] this->content;
+		this->content = new Node[this->hash_size];
+		this->word_number = 0;
+		return;
+	}
 	sortlist(strlist, cntlist, 0, l-1);
 	Node* old_content = this->content;
 	this->content = new Node[this->hash_size];

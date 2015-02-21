@@ -1,8 +1,8 @@
 /* 
 * @Author: largelymfs
 * @Date:   2015-02-17 23:37:15
-* @Last Modified by:   largelymfs
-* @Last Modified time: 2015-02-18 01:02:31
+* @Last Modified by:   largelyfs
+* @Last Modified time: 2015-02-21 22:16:54
 */
 
 #include "embedding.h"
@@ -53,25 +53,25 @@ double& Embedding::operator[](int index){
 	return this->elem[index];
 }
 
-int main(){
-	Embedding *e = new Embedding(10);
-	RandomGen *r = new RandomGen();
-	Embedding *e1 = new Embedding(10);
-	e->randomGenerate(*r);
-	e1->randomGenerate(*r);
-	e1->show();
-	std::cout << e->Dot(*e1) << std::endl;
-	std::cout << e1->Dot(*e) << std::endl;
-	for (int i = 0; i < 10; i++){
-		(*e1)[i] = 0.0;
-	}
-	e1->show();
-	std::cout << e->Dot(*e1) << std::endl;
-	std::cout << e1->Dot(*e) << std::endl;
-	e1->randomGenerate(*r);
-	std::cout << e->similarity(*e1) << std::endl;
-	delete e;
-	delete e1;
-	delete r;
-    return 0;
-}
+// int main(){
+// 	Embedding *e = new Embedding(10);
+// 	RandomGen *r = new RandomGen();
+// 	Embedding *e1 = new Embedding(10);
+// 	e->randomGenerate(*r);
+// 	e1->randomGenerate(*r);
+// 	e1->show();
+// 	std::cout << e->Dot(*e1) << std::endl;
+// 	std::cout << e1->Dot(*e) << std::endl;
+// 	for (int i = 0; i < 10; i++){
+// 		(*e1)[i] = 0.0;
+// 	}
+// 	e1->show();
+// 	std::cout << e->Dot(*e1) << std::endl;
+// 	std::cout << e1->Dot(*e) << std::endl;
+// 	e1->randomGenerate(*r);
+// 	std::cout << e->similarity(*e1) << std::endl;
+// 	delete e;
+// 	delete e1;
+// 	delete r;
+//     return 0;
+// }

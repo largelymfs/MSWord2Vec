@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-20 21:14:18
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-21 20:18:04
+* @Last Modified time: 2015-02-21 22:17:23
 */
 
 #include <iostream>
@@ -41,13 +41,13 @@ long long VocabGen::size(){
 
 using namespace std;
 
-int main(){
-	VocabGen *g = new VocabGen("test.txt", 100);
-	g->buildVocab();
-	g->reduceVocab(0);
-	char s[2] = "I";
-	std::cout << g->searchWord(s) << std::endl;
-	std::cout << g->size() << std::endl;
-	delete g;
-    return 0;
-}
+// int main(){
+// 	VocabGen *g = new VocabGen("test.txt", 100);
+// 	g->buildVocab();
+// 	g->reduceVocab(0);
+// 	char s[2] = "I";
+// 	std::cout << g->searchWord(s) << std::endl;
+// 	std::cout << g->size() << std::endl;
+// 	delete g;
+//     return 0;
+// }
