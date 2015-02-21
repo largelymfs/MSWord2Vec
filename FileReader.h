@@ -1,5 +1,7 @@
 #ifndef FILEREADER_H
 #define FILEREADER_H
+#include <string>
+#include <stdlib>
 
 class FileReader{
 public:
