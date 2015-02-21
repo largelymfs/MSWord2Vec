@@ -1,6 +1,6 @@
 #ifndef FILEREADER_H
 #define FILEREADER_H
-#include <string>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
