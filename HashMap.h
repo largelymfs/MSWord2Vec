@@ -2,7 +2,7 @@
 #define HASHMAP_H
 #include <vector>
 #include <string>
-#include <stdlib>
+#include <stdlib.h>
 struct Node{
 	long long cnt, index;
 	char* word;
