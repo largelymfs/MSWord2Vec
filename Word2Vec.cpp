@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-21 22:36:49
+* @Last Modified time: 2015-02-21 23:48:39
 */
 
 #include <iostream>
@@ -29,7 +29,23 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 }
 
 Word2Vec::~Word2Vec(){
-	if (v!=NULL) delete v; 
+	if (v!=NULL) delete v;
+	int l = this->globalembeddings.size();
+	for (int i = 0; i < l; i++)
+		if (this->globalembeddings[i] != NULL) delete this->globalembeddings[i];
+	int li, lj;
+	li = this->senseembeddings.size();
+	for (int i = 0; i < li; i++){
+		lj = this->senseembeddings[i].size();
+		for (int j = 0; j < lj; j++) 
+			if (this->senseembeddings[i][j] != NULL) delete this->senseembeddings[i][j];
+	}
+	li = this->clusterembeddings.size();
+	for (int i = 0; i < li; i++){
+		lj = this->clusterembeddings[i].size();
+		for (int j = 0; j < lj; j++)
+			if (this->clusterembeddings[i][j] != NULL) delete this->clusterembeddings[i][j];
+	}
 }
 
 void Word2Vec::resetWeights(){
