@@ -13,6 +13,7 @@ public:
 				int size, double alpha, 
 				double min_alpha, int negative);
 	void resetWeights();
+	void saveModel(const char* filename);
 	~Word2Vec();
 private:
 	VocabGen* v;

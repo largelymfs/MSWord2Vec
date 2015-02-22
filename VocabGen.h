@@ -12,6 +12,7 @@ public:
 	void buildVocab();
 	void reduceVocab(int min_count);
 	long long searchWord(char* word);
+	std::string& searchWordContent(int index);
 	~VocabGen();
 	long long size();
 private:

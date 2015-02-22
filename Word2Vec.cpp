@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 15:02:45
+* @Last Modified time: 2015-02-22 16:50:58
 */
 
 #include <iostream>
@@ -72,8 +72,26 @@ void Word2Vec::resetWeights(){
 		this->clusternumber.push_back(1);
 	}
 }
+
+void Word2Vec::saveModel(const char* filename){
+	FILE *fo;
+	fo = fopen(filename,"wb");
+	fprintf(fo, "%lld %d\n", this->word_number, this->layer1_size);
+	for (int i = 0; i < this->word_number; i++){
+		fprintf(fo, "%s ", this->v->searchWordContent(i).c_str());
+		for (int j = 0; j < this->layer1_size; j++)
+			fprintf(fo,"%lf ", (*(this->globalembeddings[i]))[j]);
+		fprintf(fo, "\n");
+		for (int num = 0; num < this->clusternumber[i]; num++){
+			for (int j = 0; j< this->layer1_size; j++)
+				fprintf(fo, "%lf ", (*(this->senseembeddings[i][num]))[j]);
+			fprintf(fo, "\n");
+		}
+	}
+}
 int main(){
 	Word2Vec *w = new Word2Vec("test.txt",0);
+	w->saveModel("output.txt");
 	delete w;
     return 0;
 }
