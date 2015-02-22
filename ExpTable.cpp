@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-22 15:35:19
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 15:45:52
+* @Last Modified time: 2015-02-22 23:00:40
 */
 
 #include <iostream>
@@ -29,10 +29,10 @@ double& ExpTable::operator[](int index){
 	return this->elem[index];
 }
 
-int main(){
-	ExpTable *e = new ExpTable(1000, 6);
-	for (int i = 0; i< 10; i++)
-		std::cout << (*e)[i] << std::endl;
-	delete e;
-    return 0;
-}
+// int main(){
+// 	ExpTable *e = new ExpTable(1000, 6);
+// 	for (int i = 0; i< 10; i++)
+// 		std::cout << (*e)[i] << std::endl;
+// 	delete e;
+//     return 0;
+// }

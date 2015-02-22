@@ -30,6 +30,7 @@ public:
 	void show();
 	void reduce_vocab(int min_count);
 	long long size();
+	long long searchWordCnt(int index);
 	std::string& searchWordContent(int index);
 private:
 	Node* content;

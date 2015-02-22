@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 16:23:52
+* @Last Modified time: 2015-02-22 22:44:02
 */
 
 #include <iostream>
@@ -176,6 +176,9 @@ std::string& HashMap::searchWordContent(int index){
 	return this->strlist[index];
 }
 
+long long HashMap::searchWordCnt(int index){
+	return this->cntlist[index];
+}
 using namespace std;
 
 

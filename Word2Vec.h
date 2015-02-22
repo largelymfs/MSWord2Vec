@@ -5,6 +5,9 @@
 
 #include "embedding.h"
 #include "VocabGen.h"
+#include "ExpTable.h"
+#include <math.h>
+
 
 class Word2Vec{
 public:
@@ -13,13 +16,18 @@ public:
 				int size, double alpha, 
 				double min_alpha, int negative);
 	void resetWeights();
+	void inittable();
 	void saveModel(const char* filename);
+	void trainModel();
+	void trainModelThread(void *id);
 	~Word2Vec();
 private:
 	VocabGen* v;
 	RandomGen* r;
+	ExpTable* e;
+	int *table;
 	int layer1_size, window_size, min_count, negative;
-	long long word_number;
+	long long word_number, tablesize;
 	double alpha, min_alpha;
 	std::vector<Embedding*> globalembeddings;
 	std::vector< std::vector<Embedding*> > senseembeddings;

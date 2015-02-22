@@ -2,12 +2,16 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 16:50:58
+* @Last Modified time: 2015-02-22 23:15:45
 */
 
 #include <iostream>
 
 #define MAX_STRING_LENGTH 100
+#define  TABLE_SIZE 1e8
+#define EXPTABLE_MAX_TABLE_SIZE 1000
+#define EXPTABLE_MAX_EXP 6
+
 
 using namespace std;
 #include "Word2Vec.h"
@@ -17,21 +21,27 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					double min_alpha=0.001, int negative = 5){
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
 	this->r = new RandomGen();
+	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
 	this->min_count = min_count;
 	this->window_size = window;
 	this->alpha = alpha;
 	this->min_alpha = min_alpha;
 	this->layer1_size = size;
 	this->negative = negative;
+	this->tablesize = TABLE_SIZE;
+	this->table = NULL;
 	this->v->buildVocab();
 	this->v->reduceVocab(this->min_count);
 	this->word_number = this->v->size();
 	this->resetWeights();
+	this->inittable();
 }
 
 Word2Vec::~Word2Vec(){
 	if (v!=NULL) delete v;
 	if (r!=NULL) delete r;
+	if (e!=NULL) delete e;
+	if (this->table!=NULL) delete this->table;
 	int l = this->globalembeddings.size();
 	for (int i = 0; i < l; i++)
 		if (this->globalembeddings[i] != NULL) delete this->globalembeddings[i];
@@ -70,6 +80,33 @@ void Word2Vec::resetWeights(){
 		v2.clear();v2.push_back(0);
 		this->wordfreq.push_back(v2);
 		this->clusternumber.push_back(1);
+	}
+	//generate the random weights
+	for (int i = 0; i < this->word_number; i++){
+		this->globalembeddings[i]->randomGenerate(*(this->r));
+		this->clusterembeddings[i][0]->randomGenerate(*(this->r));
+		this->senseembeddings[i][0]->randomGenerate(*(this->r));
+	}
+	// this->globalembeddings[0]->show();
+	// this->senseembeddings[0][0]->show();
+	// this->clusterembeddings[0][0]->show();
+}
+
+void Word2Vec::inittable(){
+	int a, i;
+	double train_words_pow = 0;
+	double d1, power = 0.75;
+	this->table = new int[this->tablesize];
+	for (a = 0; a < this->word_number; a++) train_words_pow += pow(this->v->searchWordCnt(a), power);
+	i = 0;
+	d1 = pow(this->v->searchWordCnt(i), power) / train_words_pow;
+	for (a = 0; a < this->tablesize; a++){
+		this->table[a] = i;
+		if (a / double(this->tablesize) > d1){
+			i++;
+			d1 += pow(this->v->searchWordCnt(i), power) / train_words_pow;
+		}
+		if (i >= this->word_number) i = this->word_number -1;
 	}
 }
 

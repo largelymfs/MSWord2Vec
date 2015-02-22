@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-20 21:14:18
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 16:45:56
+* @Last Modified time: 2015-02-22 22:47:01
 */
 
 #include <iostream>
@@ -41,6 +41,10 @@ long long VocabGen::size(){
 
 std::string& VocabGen::searchWordContent(int index){
 	return this->h->searchWordContent(index);
+}
+
+long long VocabGen::searchWordCnt(int index){
+	return this->h->searchWordCnt(index);
 }
 using namespace std;
 
