@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-21 22:35:41
+* @Last Modified time: 2015-02-22 16:23:52
 */
 
 #include <iostream>
@@ -132,7 +132,7 @@ void HashMap::addWord(const char *word, int cnt){
 }
 
 void HashMap::show(){
-	std::cout << std::endl << std::endl << std::endl;
+	std::cout << std::endl;
 	std::cout << "\t\tindex\t\tcount\t\twordindex\t\tword" << std::endl;
 	for (int i = 0; i < this->hash_size; i++){
 		if (this->content[i].cnt!=0){
@@ -142,34 +142,38 @@ void HashMap::show(){
 }
 
 void HashMap::reduce_vocab(int min_count){
-	std::vector<std::string> strlist;
-	std::vector<int> cntlist;
+	this->strlist.clear();
+	this->cntlist.clear();
 	for (int i = 0; i < this->hash_size; i++){
 		if (this->content[i].cnt != 0 && this->content[i].cnt > min_count){
-			strlist.push_back(std::string(this->content[i].word));
-			cntlist.push_back(this->content[i].cnt);
+			this->strlist.push_back(std::string(this->content[i].word));
+			this->cntlist.push_back(this->content[i].cnt);
 		}
 	}
 
-	int l = strlist.size();
+	int l = this->strlist.size();
 	if (l==0){
 		delete[] this->content;
 		this->content = new Node[this->hash_size];
 		this->word_number = 0;
 		return;
 	}
-	sortlist(strlist, cntlist, 0, l-1);
+	sortlist(this->strlist, this->cntlist, 0, l-1);
 	Node* old_content = this->content;
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
 	for (int i = 0; i < l; i++)
-		this->addWord(strlist[i].c_str(), cntlist[i]);
+		this->addWord(this->strlist[i].c_str(), this->cntlist[i]);
 
 	delete[] old_content;
 }
 
 long long HashMap::size(){
 	return this->word_number;
+}
+
+std::string& HashMap::searchWordContent(int index){
+	return this->strlist[index];
 }
 
 using namespace std;
@@ -186,8 +190,10 @@ using namespace std;
 // 	h->addWord(t, 1);
 // 	h->addWord(t, 1);
 // 	h->show();
-// 	h->reduce_vocab(2);
+// 	h->reduce_vocab(1);
 // 	h->show();
+// 	std::cout << h->searchWordContent(0) << std::endl;
+// 	std::cout << h->searchWordContent(1) << std::endl;
 // 	delete h;	
 //     return 0;
 // }
