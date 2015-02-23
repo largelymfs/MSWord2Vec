@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 14:44:59
+* @Last Modified time: 2015-02-23 22:22:55
 */
 
 #include "pthread.h"
@@ -88,6 +88,8 @@ void* trainModelThread(void* id){
 				last_word = sen[last_word];
 				if (last_word==-1) continue;
 				Embedding* e1 = w->senseembeddings[last_word][0];
+				for (int p = 0; p < w->layer1_size; p++)
+					(*work)[p] = 0.0;
 				unsigned long long label, nextrandom;
 				long long target;
 				for (int d = 0; d < w->negative+1; d++){
