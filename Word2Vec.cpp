@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 14:08:34
+* @Last Modified time: 2015-02-23 14:09:20
 */
 
 #include "pthread.h"
@@ -122,8 +122,8 @@ void* trainModelThread(void* id){
 
 Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
 					int window=5, int size=100, double alpha=0.25, 
-					double min_alpha=0.001, int negative = 5,
-					int thread_number = 1){
+					double min_alpha=0.001, int negative = 15,
+					int thread_number = 4){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
