@@ -14,19 +14,22 @@ public:
 	Word2Vec(	const char* filename, 
 				int min_count, int window, 
 				int size, double alpha, 
-				double min_alpha, int negative);
+				double min_alpha, int negative,
+				int thread_number);
 	void resetWeights();
 	void inittable();
 	void saveModel(const char* filename);
 	void trainModel();
-	void trainModelThread(void *id);
+
+	friend void* trainModelThread(void *id);
+	
 	~Word2Vec();
 private:
 	VocabGen* v;
 	RandomGen* r;
 	ExpTable* e;
 	int *table;
-	int layer1_size, window_size, min_count, negative;
+	int layer1_size, window_size, min_count, negative, thread_number;
 	long long word_number, tablesize;
 	double alpha, min_alpha;
 	std::vector<Embedding*> globalembeddings;

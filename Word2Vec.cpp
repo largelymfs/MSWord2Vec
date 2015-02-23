@@ -2,10 +2,13 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 23:15:45
+* @Last Modified time: 2015-02-23 11:17:19
 */
 
+#include "pthread.h"
 #include <iostream>
+
+
 
 #define MAX_STRING_LENGTH 100
 #define  TABLE_SIZE 1e8
@@ -15,10 +18,23 @@
 
 using namespace std;
 #include "Word2Vec.h"
+struct Word2vecWithInt{
+	int id;
+	Word2Vec* w;
+	Word2vecWithInt(Word2Vec* w, int id):id(id),w(w){}
+};
+
+void* trainModelThread(void* id){
+	Word2vecWithInt* data = (Word2vecWithInt*)(id);
+	Word2Vec* w = data->w;
+	
+	return NULL;
+}
 
 Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
 					int window=5, int size=100, double alpha=0.25, 
-					double min_alpha=0.001, int negative = 5){
+					double min_alpha=0.001, int negative = 5,
+					int thread_number = 4){
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
 	this->r = new RandomGen();
 	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
@@ -30,11 +46,13 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->negative = negative;
 	this->tablesize = TABLE_SIZE;
 	this->table = NULL;
+	this->thread_number = thread_number;
 	this->v->buildVocab();
 	this->v->reduceVocab(this->min_count);
 	this->word_number = this->v->size();
 	this->resetWeights();
 	this->inittable();
+	this->trainModel();
 }
 
 Word2Vec::~Word2Vec(){
@@ -79,7 +97,7 @@ void Word2Vec::resetWeights(){
 		std::vector<long long> v2;
 		v2.clear();v2.push_back(0);
 		this->wordfreq.push_back(v2);
-		this->clusternumber.push_back(1);
+		this->clusternumber.push_back(0);
 	}
 	//generate the random weights
 	for (int i = 0; i < this->word_number; i++){
@@ -119,13 +137,28 @@ void Word2Vec::saveModel(const char* filename){
 		for (int j = 0; j < this->layer1_size; j++)
 			fprintf(fo,"%lf ", (*(this->globalembeddings[i]))[j]);
 		fprintf(fo, "\n");
-		for (int num = 0; num < this->clusternumber[i]; num++){
+		for (int num = 0; num < this->clusterembeddings[i].size(); num++){
 			for (int j = 0; j< this->layer1_size; j++)
 				fprintf(fo, "%lf ", (*(this->senseembeddings[i][num]))[j]);
 			fprintf(fo, "\n");
 		}
 	}
 }
+
+void Word2Vec::trainModel(){
+	pthread_t *pt = new pthread_t[this->thread_number];
+	Word2vecWithInt** data = new Word2vecWithInt*[this->thread_number];
+	for (int i = 0; i < this->thread_number; i++){
+		data[i] = new Word2vecWithInt(this, i);
+	}
+	for (int i = 0; i < this->thread_number; i++) pthread_create(&pt[i], NULL, trainModelThread, (void*)(data[i]));
+	for (int i = 0; i < this->thread_number; i++) pthread_join(pt[i], NULL);
+	for (int i = 0; i < this->thread_number; i++) delete data[i];
+	delete data;
+	delete pt;
+}
+
+
 int main(){
 	Word2Vec *w = new Word2Vec("test.txt",0);
 	w->saveModel("output.txt");
