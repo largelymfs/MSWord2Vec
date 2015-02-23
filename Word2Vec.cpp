@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 14:09:20
+* @Last Modified time: 2015-02-23 14:44:59
 */
 
 #include "pthread.h"
@@ -48,6 +48,13 @@ void* trainModelThread(void* id){
 		if (word_count - last_word_count > 10000){
 			w->word_counts_actual += word_count - last_word_count;
 			last_word_count = word_count;
+
+			now = clock();
+			printf("%cAlpha: %f  Progress: %.2f%%  Words/thread/sec: %.2fk  ", 13, alpha,
+         	w->word_counts_actual / (double)(w->total_words + 1) * 100,
+         	w->word_counts_actual / ((double)(now - start + 1) / (double)CLOCKS_PER_SEC * 1000));
+			fflush(stdout);
+
 			alpha = w->alpha * (1- w->word_counts_actual / (double)(total_words+1));
 			if (alpha < min_alpha) alpha = min_alpha;
 		}
@@ -123,7 +130,7 @@ void* trainModelThread(void* id){
 Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
 					int window=5, int size=100, double alpha=0.25, 
 					double min_alpha=0.001, int negative = 15,
-					int thread_number = 4){
+					int thread_number = 1){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
@@ -143,6 +150,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->filesize = this->v->fileSize();
 	this->word_number = this->v->size();
 	this->total_words = this->v->totalWords();
+	this->start = clock();
 	this->resetWeights();
 	this->inittable();
 	this->trainModel();
@@ -254,7 +262,7 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("text8",4);
+	Word2Vec *w = new Word2Vec("test.txt",0);
 	w->saveModel("output.txt");
 	delete w;
     return 0;
