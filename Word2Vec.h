@@ -30,8 +30,10 @@ private:
 	ExpTable* e;
 	int *table;
 	int layer1_size, window_size, min_count, negative, thread_number;
-	long long word_number, tablesize;
+	long long word_number, tablesize, filesize, total_words, word_counts_actual;
 	double alpha, min_alpha;
+	char* filename;
+	clock_t  start;
 	std::vector<Embedding*> globalembeddings;
 	std::vector< std::vector<Embedding*> > senseembeddings;
 	std::vector< std::vector<Embedding*> > clusterembeddings;

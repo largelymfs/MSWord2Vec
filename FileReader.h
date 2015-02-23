@@ -6,8 +6,9 @@
 
 class FileReader{
 public:
-	FileReader(const char* filename, int max_string);
+	FileReader(const char* filename, int max_string, long long starting_position);
 	~FileReader();
+	long long fileSize();
 	bool hasWord();
 	void getWord(char* word);
 private:

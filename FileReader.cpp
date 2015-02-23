@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 15:23:16
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-20 21:28:42
+* @Last Modified time: 2015-02-23 11:26:56
 */
 
 #include <iostream>
@@ -10,10 +10,11 @@
 
 using namespace std;
 
-FileReader::FileReader(const char* filename, int max_string):MAX_STRING(max_string){
+FileReader::FileReader(const char* filename, int max_string, long long starting_pos):MAX_STRING(max_string){
 	this->filename = new char[this->MAX_STRING];
 	strcpy(this->filename, filename);
 	this->fin = fopen(this->filename, "rb");
+	fseek(this->fin, starting_pos, SEEK_SET);
 }
 FileReader::~FileReader(){
 	if (this->filename) delete[] this->filename;
@@ -46,6 +47,9 @@ bool FileReader::hasWord(){
 		return false;
 	}
 	return true;
+}
+long long FileReader::fileSize(){
+	return this->filesize;
 }
 
 // int main(){

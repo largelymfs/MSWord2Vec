@@ -31,8 +31,10 @@ public:
 	void reduce_vocab(int min_count);
 	long long size();
 	long long searchWordCnt(int index);
+	long long totalWords();
 	std::string& searchWordContent(int index);
 private:
+	long long total_words;
 	Node* content;
 	int hash_size;
 	long long word_number;

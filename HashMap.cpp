@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 22:44:02
+* @Last Modified time: 2015-02-23 12:53:26
 */
 
 #include <iostream>
@@ -45,6 +45,7 @@ void Node::setWord(const char* word, int cnt){
 HashMap::HashMap(): hash_size(30000007){
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
+	this->total_words = 0;
 }
 HashMap::~HashMap(){
 	//delete all the content's words
@@ -99,10 +100,12 @@ void HashMap::addWord( char *word, int cnt){
 			this->content[res].setWord(word, cnt);
 			this->content[res].index = this->word_number;
 			this->word_number++;
+			this->total_words += cnt;
 			return;
 		}
 		if (strcmp(tmp->word, word)==0){
 			this->content[res].cnt+=cnt;
+			this->total_words += cnt;
 			return;
 		}
 		res++;
@@ -120,10 +123,12 @@ void HashMap::addWord(const char *word, int cnt){
 			this->content[res].setWord(word, cnt);
 			this->content[res].index = this->word_number;
 			this->word_number++;
+			this->total_words += cnt;
 			return;
 		}
 		if (strcmp(tmp->word, word)==0){
 			this->content[res].cnt+=cnt;
+			this->total_words += cnt;
 			return;
 		}
 		res++;
@@ -156,12 +161,14 @@ void HashMap::reduce_vocab(int min_count){
 		delete[] this->content;
 		this->content = new Node[this->hash_size];
 		this->word_number = 0;
+		this->total_words = 0;
 		return;
 	}
 	sortlist(this->strlist, this->cntlist, 0, l-1);
 	Node* old_content = this->content;
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
+	this->total_words = 0;
 	for (int i = 0; i < l; i++)
 		this->addWord(this->strlist[i].c_str(), this->cntlist[i]);
 
@@ -178,6 +185,9 @@ std::string& HashMap::searchWordContent(int index){
 
 long long HashMap::searchWordCnt(int index){
 	return this->cntlist[index];
+}
+long long HashMap::totalWords(){
+	return this->total_words;
 }
 using namespace std;
 

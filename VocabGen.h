@@ -14,6 +14,8 @@ public:
 	long long searchWord(char* word);
 	std::string& searchWordContent(int index);
 	long long searchWordCnt(int index);
+	long long fileSize();
+	long long totalWords();
 	~VocabGen();
 	long long size();
 private:

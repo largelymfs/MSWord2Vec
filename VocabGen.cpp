@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-20 21:14:18
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-22 22:47:01
+* @Last Modified time: 2015-02-23 12:54:02
 */
 
 #include <iostream>
@@ -10,7 +10,7 @@
 #include "VocabGen.h"
 
 VocabGen::VocabGen(const char* filename, int max_string):h(NULL),f(NULL), MAX_STRING(max_string){
-	this->f = new FileReader(filename, this->MAX_STRING);
+	this->f = new FileReader(filename, this->MAX_STRING, 0);
 	this->h = new HashMap();
 }
 
@@ -45,6 +45,13 @@ std::string& VocabGen::searchWordContent(int index){
 
 long long VocabGen::searchWordCnt(int index){
 	return this->h->searchWordCnt(index);
+}
+
+long long VocabGen::fileSize(){
+	return this->f->fileSize();
+}
+long long VocabGen::totalWords(){
+	return this->h->totalWords();
 }
 using namespace std;
 

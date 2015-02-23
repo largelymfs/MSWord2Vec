@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 11:17:19
+* @Last Modified time: 2015-02-23 14:08:34
 */
 
 #include "pthread.h"
@@ -11,9 +11,10 @@
 
 
 #define MAX_STRING_LENGTH 100
-#define  TABLE_SIZE 1e8
+#define TABLE_SIZE 1e8
 #define EXPTABLE_MAX_TABLE_SIZE 1000
 #define EXPTABLE_MAX_EXP 6
+#define MAX_SENTENCE_LENGTH 1000
 
 
 using namespace std;
@@ -27,14 +28,104 @@ struct Word2vecWithInt{
 void* trainModelThread(void* id){
 	Word2vecWithInt* data = (Word2vecWithInt*)(id);
 	Word2Vec* w = data->w;
-	
-	return NULL;
+	RandomGen *localr = new RandomGen(data->id);
+	long long sen[MAX_SENTENCE_LENGTH];
+	FileReader * localf = new FileReader(w->filename, MAX_STRING_LENGTH, w->filesize / (long long)(w->thread_number) * data->id);
+	char buf[MAX_STRING_LENGTH];
+	long long word_count, last_word_count;
+	word_count = 0;last_word_count = 0;
+	double alpha = w->alpha;
+	double min_alpha = w->min_alpha;
+	long long total_words = w->total_words;
+	clock_t now;
+	clock_t  start = w->start;
+	long long sentence_len = 0, sentence_pos = 0, word_index;
+	char ss[5]= "<\\s>";
+	long long skipline =  w->v->searchWord(ss);
+	long long now_word, last_word;
+	Embedding * work = new Embedding(w->layer1_size);
+	while (true){
+		if (word_count - last_word_count > 10000){
+			w->word_counts_actual += word_count - last_word_count;
+			last_word_count = word_count;
+			alpha = w->alpha * (1- w->word_counts_actual / (double)(total_words+1));
+			if (alpha < min_alpha) alpha = min_alpha;
+		}
+
+		if (sentence_len==0){
+			//Collect the words
+			while (true){
+				if (localf->hasWord()==0) break;
+				localf->getWord(buf);
+				word_index = w->v->searchWord(buf);
+				if (word_index==-1) continue;
+				word_count++;
+				if (word_index==skipline) break;
+				//subsampling
+				sen[sentence_len] = word_index;
+				sentence_len ++;
+				if (sentence_len > MAX_SENTENCE_LENGTH) break;
+			}
+			sentence_pos = 0;
+		}
+		if ((word_count >= total_words / w->thread_number) || (localf->hasWord()==false)) break;
+		now_word = sen[sentence_pos];
+		
+		for (int i = 0; i < w->layer1_size; i++) (*work)[i] = 0.0;
+		int reduce_window = (localr->Next()) % w->window_size;
+		for (int j = reduce_window; j < reduce_window * 2 + 1 - reduce_window; j++)
+			if (j!=w->window_size){
+				last_word = sentence_pos - w->window_size + j;
+				if (last_word < 0 ) continue;
+				if (last_word >= sentence_len) continue;
+				last_word = sen[last_word];
+				if (last_word==-1) continue;
+				Embedding* e1 = w->senseembeddings[last_word][0];
+				unsigned long long label, nextrandom;
+				long long target;
+				for (int d = 0; d < w->negative+1; d++){
+					if (d==0){
+						target = now_word;
+						label = 1;
+					}else{
+						nextrandom = localr->Next();
+						target = (w->table)[(nextrandom >> 16) % (w->tablesize)];
+						if (target == 0) target = nextrandom % (w->word_number - 1) + 1;
+						if (target == now_word) continue;
+						label = 0;
+					}
+					Embedding* e2 = w->globalembeddings[target];
+					double f = e1->Dot(*e2);
+					double g;
+					if (f > EXPTABLE_MAX_EXP) g = (label - 1) * alpha;
+					else if (f < -EXPTABLE_MAX_EXP)  g = (label - 0) * alpha;
+					else g = ( label - (*(w->e))[(int)((f + EXPTABLE_MAX_EXP) * (EXPTABLE_MAX_TABLE_SIZE / EXPTABLE_MAX_EXP / 2))]) * alpha;
+						//work+= g * global;
+					work->Saxpy((*e2), g);
+						//global += g * sense
+					e2->Saxpy((*e1), g);
+				}
+				//sense += work
+				e1->Saxpy((*work), 1.0);
+			}
+		sentence_pos++;
+		if (sentence_pos >= sentence_len){
+			sentence_len = 0;
+			continue;
+		}
+	}
+	delete work;
+	delete localr;
+	delete localf;
+	pthread_exit(NULL);
 }
 
 Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
 					int window=5, int size=100, double alpha=0.25, 
 					double min_alpha=0.001, int negative = 5,
-					int thread_number = 4){
+					int thread_number = 1){
+	this->filename = new char[MAX_STRING_LENGTH];
+	strcpy(this->filename, filename);
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
 	this->r = new RandomGen();
 	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
@@ -49,13 +140,16 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->thread_number = thread_number;
 	this->v->buildVocab();
 	this->v->reduceVocab(this->min_count);
+	this->filesize = this->v->fileSize();
 	this->word_number = this->v->size();
+	this->total_words = this->v->totalWords();
 	this->resetWeights();
 	this->inittable();
 	this->trainModel();
 }
 
 Word2Vec::~Word2Vec(){
+	if (this->filename!=NULL) delete this->filename;
 	if (v!=NULL) delete v;
 	if (r!=NULL) delete r;
 	if (e!=NULL) delete e;
@@ -160,7 +254,7 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("test.txt",0);
+	Word2Vec *w = new Word2Vec("text8",4);
 	w->saveModel("output.txt");
 	delete w;
     return 0;

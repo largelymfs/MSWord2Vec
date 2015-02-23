@@ -3,12 +3,12 @@
 
 class RandomGen{
 public:
-	RandomGen();
+	RandomGen(int seed = 1);
 	~RandomGen();
-	long long Next();
+	unsigned long long Next();
 	double Random();  //A random number from 0 to 1
 private:
-	long long next_random;
+	unsigned long long next_random;
 };
 
 
