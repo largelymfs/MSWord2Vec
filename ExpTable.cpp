@@ -2,12 +2,13 @@
 * @Author: largelyfs
 * @Date:   2015-02-22 15:35:19
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 14:06:21
+* @Last Modified time: 2015-02-24 10:22:30
 */
 
 #include <iostream>
 #include "ExpTable.h"
 using namespace std;
+#include "stdio.h"
 
 ExpTable::ExpTable(int MAX_TABLE_SIZE, int MAX_EXP) : elem(NULL), max_table_size(MAX_TABLE_SIZE), max_exp(MAX_EXP){
 	this->elem = new double[this->max_table_size];
@@ -23,6 +24,13 @@ void ExpTable::init(){
 		this->elem[i] = exp((i / (double)(this->max_table_size) * 2.0 -1.0) * this->max_exp);
 		this->elem[i] = (this->elem[i]) / (this->elem[i] + 1.0);
 	}
+}
+
+void ExpTable::show(){
+	for (int i = 0; i < this->max_table_size; i++)
+		std::cout << this->elem[i] << " ";
+	std::cout << std::endl;
+	fflush(stdout);
 }
 
 double& ExpTable::operator[](int index){

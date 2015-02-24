@@ -9,6 +9,7 @@ public:
 	void init();
 	double& operator[](int index);
 	~ExpTable();
+	void show();
 private:
 	double* elem;
 	int max_exp, max_table_size;

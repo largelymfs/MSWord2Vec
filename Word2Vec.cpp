@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 22:22:55
+* @Last Modified time: 2015-02-24 11:06:22
 */
 
 #include "pthread.h"
@@ -90,7 +90,8 @@ void* trainModelThread(void* id){
 				Embedding* e1 = w->senseembeddings[last_word][0];
 				for (int p = 0; p < w->layer1_size; p++)
 					(*work)[p] = 0.0;
-				unsigned long long label, nextrandom;
+				int label;
+				unsigned long long nextrandom;
 				long long target;
 				for (int d = 0; d < w->negative+1; d++){
 					if (d==0){
@@ -106,12 +107,22 @@ void* trainModelThread(void* id){
 					Embedding* e2 = w->globalembeddings[target];
 					double f = e1->Dot(*e2);
 					double g;
-					if (f > EXPTABLE_MAX_EXP) g = (label - 1) * alpha;
-					else if (f < -EXPTABLE_MAX_EXP)  g = (label - 0) * alpha;
-					else g = ( label - (*(w->e))[(int)((f + EXPTABLE_MAX_EXP) * (EXPTABLE_MAX_TABLE_SIZE / EXPTABLE_MAX_EXP / 2))]) * alpha;
-						//work+= g * global;
+					long long index;
+					double indexg;
+					if (f > EXPTABLE_MAX_EXP){
+						g = (label - 1.0) * alpha;
+					}else{
+						if ( f < -EXPTABLE_MAX_EXP){
+							g = (label - 0.0) * alpha;
+						}else{
+							index = (long long)((f + EXPTABLE_MAX_EXP) * (EXPTABLE_MAX_TABLE_SIZE / EXPTABLE_MAX_EXP / 2));
+							indexg = (*(w->e))[(int)(index)];
+							g = (label - indexg) * alpha;
+						}
+					}
+					//work+= g * global;
 					work->Saxpy((*e2), g);
-						//global += g * sense
+					//global += g * sense
 					e2->Saxpy((*e1), g);
 				}
 				//sense += work
@@ -138,6 +149,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
 	this->r = new RandomGen();
 	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
+	this->e->show();
 	this->min_count = min_count;
 	this->window_size = window;
 	this->alpha = alpha;
@@ -264,7 +276,7 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("test.txt",0);
+	Word2Vec *w = new Word2Vec("text8",4);
 	w->saveModel("output.txt");
 	delete w;
     return 0;
