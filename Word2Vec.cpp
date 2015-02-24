@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-24 11:06:22
+* @Last Modified time: 2015-02-24 15:57:30
 */
 
 #include "pthread.h"
@@ -69,6 +69,12 @@ void* trainModelThread(void* id){
 				word_count++;
 				if (word_index==skipline) break;
 				//subsampling
+				if (w->subsampling > 0){
+					long long cnt = w->v->searchWordCnt(word_index);
+					double ran = (sqrt(cnt / (w->subsampling * w->total_words)) + 1.0) * (w->subsampling * w->total_words) / cnt;
+					double next_random =  localr->Random();
+					if (ran < next_random) continue;
+				}
 				sen[sentence_len] = word_index;
 				sentence_len ++;
 				if (sentence_len > MAX_SENTENCE_LENGTH) break;
@@ -143,13 +149,12 @@ void* trainModelThread(void* id){
 Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
 					int window=5, int size=100, double alpha=0.25, 
 					double min_alpha=0.001, int negative = 15,
-					int thread_number = 1){
+					int thread_number = 8, double subsampling = 1e-3){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
 	this->r = new RandomGen();
 	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
-	this->e->show();
 	this->min_count = min_count;
 	this->window_size = window;
 	this->alpha = alpha;
@@ -159,6 +164,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->tablesize = TABLE_SIZE;
 	this->table = NULL;
 	this->thread_number = thread_number;
+	this->subsampling = subsampling;
 	this->v->buildVocab();
 	this->v->reduceVocab(this->min_count);
 	this->filesize = this->v->fileSize();

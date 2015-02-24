@@ -15,7 +15,7 @@ public:
 				int min_count, int window, 
 				int size, double alpha, 
 				double min_alpha, int negative,
-				int thread_number);
+				int thread_number, double subsampling);
 	void resetWeights();
 	void inittable();
 	void saveModel(const char* filename);
@@ -31,7 +31,7 @@ private:
 	int *table;
 	int layer1_size, window_size, min_count, negative, thread_number;
 	long long word_number, tablesize, filesize, total_words, word_counts_actual;
-	double alpha, min_alpha;
+	double alpha, min_alpha, subsampling;
 	char* filename;
 	clock_t  start;
 	std::vector<Embedding*> globalembeddings;
