@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 16:53:51
+* @Last Modified time: 2015-02-27 17:35:52
 */
 
 #include "pthread.h"
@@ -81,11 +81,13 @@ void* trainModelThread(void* id){
 			}
 			sentence_pos = 0;
 		}
+
 		if ((word_count >= total_words / w->thread_number) || (localf->hasWord()==false)) break;
 		now_word = sen[sentence_pos];
 		if (now_word==-1) continue;
 		for (int i = 0; i < w->layer1_size; i++) (*work)[i] = 0.0;
 		int reduce_window = (localr->Next()) % w->window_size;
+		
 		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
 			if (j!=w->window_size){
 				last_word = sentence_pos - w->window_size + j;
@@ -93,20 +95,24 @@ void* trainModelThread(void* id){
 				if (last_word >= sentence_len) continue;
 				last_word = sen[last_word];
 				if (last_word==-1) continue;
-				Embedding* e1 = w->senseembeddings[last_word][0];
-				for (int p = 0; p < w->layer1_size; p++)
-					(*work)[p] = 0.0;
+
+				//Embedding* e1 = w->senseembeddings[last_word][0];
+				Embedding* e1 = w->senseembeddings[now_word][0];
+				//get the context embeddings
+				//choose the right sense 
+				// update the cluster embeddings
+				for (int p = 0; p < w->layer1_size; p++) (*work)[p] = 0.0;
 				int label;
 				unsigned long long nextrandom;
 				long long target;
 				for (int d = 0; d < w->negative+1; d++){
 					if (d==0){
-						target = now_word;
+						target = last_word;
 						label = 1;
 					}else{
 						nextrandom = localr->Next();
 						target = (w->table)[(nextrandom >> 16) % (w->tablesize)];
-						if (target == now_word) continue;
+						if (target == last_word) continue;
 						label = 0;
 					}
 					Embedding* e2 = w->globalembeddings[target];
