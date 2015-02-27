@@ -2,12 +2,13 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 12:42:48
+* @Last Modified time: 2015-02-27 16:49:12
 */
 
 #include <iostream>
 #include "HashMap.h"
 
+//sort string vector and int vector together
 void sortlist(std::vector<std::string>& strlist, std::vector<int>& cntlist, int l, int r){
 	int i, j, xcnt, mid, tmpcnt;
 	std::string xstr, tmpstr;
@@ -29,6 +30,7 @@ void sortlist(std::vector<std::string>& strlist, std::vector<int>& cntlist, int 
 	if (i < r) sortlist(strlist, cntlist, i, r);
 }
 
+// For Hash Node
 void Node::setWord( char* word, int cnt){
 	int l = strlen(word);
 	this->word = new char[l + 1];
@@ -48,13 +50,12 @@ HashMap::HashMap(): hash_size(30000007){
 	this->total_words = 0;
 }
 HashMap::~HashMap(){
-	//delete all the content's words
-	// for (int i = 0; i < this->hash_size; i++){
-	// 	if (this->content[i].cnt!=0) std::cout << this->content[i].word << std::endl;
-	// 	//if (this->content[i].cnt!=0) delete[] this->content[i].word;
-	// }
 	delete[] this->content;
 }
+
+// For HashTable
+
+//Get Hash Number (256-number)
 long long HashMap::Hash( char* word){
 	long long res = 0;
 	int l = strlen(word);
@@ -147,15 +148,13 @@ void HashMap::show(){
 }
 
 void HashMap::reduce_vocab(int min_count){
-	std::cout << "Reducing Vocab" << std::endl;
 	this->strlist.clear();
 	this->cntlist.clear();
-	for (int i = 0; i < this->hash_size; i++){
+	for (int i = 0; i < this->hash_size; i++)
 		if ((this->content[i].cnt != 0 && this->content[i].cnt > min_count) || ((this->content[i].word!=NULL) && (strcmp(this->content[i].word,"</s>")==0))){
 			this->strlist.push_back(std::string(this->content[i].word));
 			this->cntlist.push_back(this->content[i].cnt);
 		}
-	}
 
 	int l = this->strlist.size();
 	if (l==0){
@@ -170,11 +169,8 @@ void HashMap::reduce_vocab(int min_count){
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
 	this->total_words = 0;
-	for (int i = 0; i < l; i++){
+	for (int i = 0; i < l; i++)
 		this->addWord(this->strlist[i].c_str(), this->cntlist[i]);
-	}
-	char ss[5]="</s>";
-	std::cout << "HERE : " << this->searchWordIndex(ss) << std::endl;
 	delete[] old_content;
 }
 
@@ -192,9 +188,9 @@ long long HashMap::searchWordCnt(int index){
 long long HashMap::totalWords(){
 	return this->total_words;
 }
-using namespace std;
 
 
+// Test Code
 // int main(){
 // 	HashMap *h = new HashMap();
 // 	char s[10]="hellolibo";

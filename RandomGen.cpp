@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-17 23:45:12
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 13:57:25
+* @Last Modified time: 2015-02-27 16:49:28
 */
 #include "RandomGen.h"
 #include <iostream>
@@ -24,6 +24,8 @@ double RandomGen::Random(){
 }
 
 using namespace std;
+
+
 /*
 int main(){
 	RandomGen *r = new RandomGen();

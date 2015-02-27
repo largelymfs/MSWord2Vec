@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 13:53:09
+* @Last Modified time: 2015-02-27 16:53:51
 */
 
 #include "pthread.h"
@@ -25,6 +25,7 @@ struct Word2vecWithInt{
 	Word2vecWithInt(Word2Vec* w, int id):id(id),w(w){}
 };
 
+// train the model using pthreads
 void* trainModelThread(void* id){
 	Word2vecWithInt* data = (Word2vecWithInt*)(id);
 	Word2Vec* w = data->w;
@@ -49,13 +50,11 @@ void* trainModelThread(void* id){
 		if (word_count - last_word_count > 10000){
 			w->word_counts_actual += word_count - last_word_count;
 			last_word_count = word_count;
-
 			now = clock();
 			printf("%cAlpha: %f  Progress: %.2f%%  Words/thread/sec: %.2fk  ", 13, alpha,
          	w->word_counts_actual / (double)(w->total_words + 1) * 100,
          	w->word_counts_actual / ((double)(now - start + 1) / (double)CLOCKS_PER_SEC * 1000));
 			fflush(stdout);
-
 			alpha = w->alpha * (1- w->word_counts_actual / (double)(total_words+1));
 			if (alpha < min_alpha) alpha = min_alpha;
 		}
@@ -126,8 +125,6 @@ void* trainModelThread(void* id){
 							g = (label - indexg) * alpha;
 						}
 					}
-					// printf("%llf, %llf\n", f, g);
-					// fflush(stdout);
 					//work+= g * global;
 					work->Saxpy((*e2), g);
 					//global += g * sense
@@ -135,8 +132,6 @@ void* trainModelThread(void* id){
 				}
 				//sense += work
 				e1->Saxpy((*work), 1.0);
-				// printf("%lf %lf\n",work->Norm(), e1->Norm());
-				// fflush(stdout);
 			}
 		sentence_pos++;
 		if (sentence_pos >= sentence_len){
@@ -231,9 +226,6 @@ void Word2Vec::resetWeights(){
 		this->clusterembeddings[i][0]->randomGenerate(*(this->r));
 		this->senseembeddings[i][0]->randomGenerate(*(this->r));
 	}
-	// this->globalembeddings[0]->show();
-	// this->senseembeddings[0][0]->show();
-	// this->clusterembeddings[0][0]->show();
 }
 
 void Word2Vec::inittable(){
@@ -252,16 +244,6 @@ void Word2Vec::inittable(){
 		}
 		if (i >= this->word_number) i = this->word_number -1;
 	}
-	// int lastnumber = 0, now = 0 ;
-	// for (int i = 0; i < this->tablesize; i++){
-	// 	if (lastnumber!=this->table[i]){
-	// 		std::cout << this->v->searchWordContent(lastnumber) << " " << now << std::endl;
-	// 		now = 0;
-	// 		lastnumber++;
-	// 	}
-	// 	now++;
-	// }
-	// std::cout << std::endl;
 }
 
 void Word2Vec::saveModel(const char* filename){

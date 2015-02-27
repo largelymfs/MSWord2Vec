@@ -8,7 +8,7 @@
 #include "ExpTable.h"
 #include <math.h>
 
-
+// Solution Class
 class Word2Vec{
 public:
 	Word2Vec(	const char* filename, 
@@ -16,12 +16,12 @@ public:
 				int size, double alpha, 
 				double min_alpha, int negative,
 				int thread_number, double subsampling);
-	void resetWeights();
-	void inittable();
-	void saveModel(const char* filename);
-	void trainModel();
+	void resetWeights();								// reset the weights
+	void inittable();									// sample table
+	void saveModel(const char* filename);				// output to the file
+	void trainModel();									// train 
 
-	friend void* trainModelThread(void *id);
+	friend void* trainModelThread(void *id);			// thread to train the whole model
 	
 	~Word2Vec();
 private:

@@ -8,9 +8,9 @@ class FileReader{
 public:
 	FileReader(const char* filename, int max_string, long long starting_position);
 	~FileReader();
-	long long fileSize();
-	bool hasWord();
-	void getWord(char* word);
+	long long fileSize();															// get file size
+	bool hasWord();																	// check whether file ends
+	void getWord(char* word);														// fetch a word
 private:
 	const int MAX_STRING;
 	char* filename;

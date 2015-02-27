@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Hash Table Node
 struct Node{
 	long long cnt, index;
 	char* word;
@@ -17,22 +18,23 @@ struct Node{
 	void setWord(const char* w, int cnt);
 };
 
+//Hash Table
 class HashMap{
 public:
 	HashMap();
 	~HashMap();
-	void addWord( char* word, int cnt);
-	void addWord(const char* word, int cnt);
-	long long Hash( char* word);
+	void addWord( char* word, int cnt);						// add a word into the table
+	void addWord(const char* word, int cnt);				
+	long long Hash( char* word);							// calculate hash
 	long long Hash(const char* word);
-	long long searchWord( char* word);
-	long long searchWordIndex( char* word);
-	void show();
-	void reduce_vocab(int min_count);
-	long long size();
-	long long searchWordCnt(int index);
-	long long totalWords();
-	std::string& searchWordContent(int index);
+	long long searchWord( char* word);						// search the position of a word
+	long long searchWordIndex( char* word);					// search the index of a word
+	void show();											// print it out
+	void reduce_vocab(int min_count);						// reduce all the words appears only little times
+	long long size();										// word number in the table
+	long long searchWordCnt(int index);						// search the counts of a word
+	long long totalWords();									// the total word times in the dataset
+	std::string& searchWordContent(int index);				// search the word of an index
 private:
 	long long total_words;
 	Node* content;

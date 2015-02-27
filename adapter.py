@@ -3,9 +3,10 @@
 # @Author: largelyfs
 # @Date:   2015-02-24 10:58:11
 # @Last Modified by:   largelyfs
-# @Last Modified time: 2015-02-24 10:59:44
+# @Last Modified time: 2015-02-27 16:34:17
 
 
+#convert the MS-word2vec to Word2vec model
 def convert(input, output):
 	with open(input) as fin, open(output,"w") as fout:
 		print >>fout, fin.readline().strip()
