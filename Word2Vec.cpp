@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 17:35:52
+* @Last Modified time: 2015-02-27 17:58:46
 */
 
 #include "pthread.h"
@@ -155,8 +155,11 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025, 
 					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 8, double subsampling = 1e-3){
+
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
+
+
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
 	this->r = new RandomGen();
 	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
@@ -170,6 +173,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->table = NULL;
 	this->thread_number = thread_number;
 	this->subsampling = subsampling;
+
 	this->v->buildVocab();
 	this->v->reduceVocab(this->min_count);
 	this->filesize = this->v->fileSize();

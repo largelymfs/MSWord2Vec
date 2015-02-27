@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 16:49:12
+* @Last Modified time: 2015-02-27 17:54:39
 */
 
 #include <iostream>
@@ -188,7 +188,7 @@ long long HashMap::searchWordCnt(int index){
 long long HashMap::totalWords(){
 	return this->total_words;
 }
-
+using namespace std;
 
 // Test Code
 // int main(){
