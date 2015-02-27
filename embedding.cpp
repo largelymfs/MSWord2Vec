@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-17 23:37:15
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 11:23:34
+* @Last Modified time: 2015-02-28 00:15:11
 */
 
 #include "embedding.h"
@@ -51,6 +51,15 @@ double Embedding::Dot( Embedding& e){
 }
 double& Embedding::operator[](int index){
 	return this->elem[index];
+}
+
+void Embedding::Clear(){
+	for (int i = 0; i < this->size; i++)
+		this->elem[i] = 0.0;
+}
+void Embedding::Multi(double g){
+	for (int i = 0; i < this->size; i++)
+		this->elem[i] = this->elem[i] * g;
 }
 
 // int main(){

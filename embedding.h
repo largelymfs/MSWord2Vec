@@ -15,6 +15,8 @@ public:
 	void show(); 							// print
 	double Dot(Embedding& e);				// calculate this * e
 	double& operator[](int index);			// index
+	void Clear();							// set to zeros
+	void Multi(double g);					// calculate this * e(number)
 private:
 	double *elem;
 	int size;

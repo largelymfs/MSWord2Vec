@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date: 五  2 27 23:07:16 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 23:21:36
+* @Last Modified time: 2015-02-28 01:58:12
 */
 
 #include "pthread.h"
@@ -88,7 +88,55 @@ void* trainModelThread(void* id){
 		if (now_word==-1) continue;
 		for (int i = 0; i < w->layer1_size; i++) (*work)[i] = 0.0;
 		int reduce_window = (localr->Next()) % w->window_size;
+		// get context cluster
+		Embedding* context = new Embedding(w->layer1_size);
+		context->Clear();
+		int context_comp = 0;
+		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
+			if (j != w->window_size){
+				last_word = sentence_pos - w->window_size + j;
+				if (last_word < 0) continue;
+				if (last_word >= sentence_len) continue;
+				last_word = sen[last_word];
+				if (last_word==-1) continue;
+				context_comp++;
+				context->Saxpy(*(w->globalembeddings[last_word]), 1.0);
+			}
+		if (context_comp!=0){
 
+
+		context->Multi(1.0/(double)(context_comp));
+		int sense = 0;
+		double maxsimilarity = w->lambda;
+		//choose the right sense
+		for (int i = 0; i < w->senseembeddings[now_word].size(); i++){
+			double tmp_similarity = context->similarity(*(w->clusterembeddings[now_word][i]));
+			if (tmp_similarity > maxsimilarity){
+				sense = i;
+				maxsimilarity = tmp_similarity;
+			}
+		}
+		
+		if (maxsimilarity==w->lambda){
+			Embedding* newembeddings = new Embedding(w->layer1_size);
+			newembeddings->randomGenerate(*localr);
+			w->senseembeddings[now_word].push_back(newembeddings);
+			newembeddings = new Embedding(w->layer1_size);
+			newembeddings->Clear();
+			newembeddings->Saxpy(*(context), 1.0);
+			w->clusterembeddings[now_word].push_back(newembeddings);
+			w->wordfreq[now_word].push_back(1);
+			sense = w->clusterembeddings[now_word].size()-1;
+		}else{
+			w->clusterembeddings[now_word][sense] -> Multi((double)(w->wordfreq[now_word][sense]));
+			w->clusterembeddings[now_word][sense] -> Saxpy((*context), 1.0);
+			w->wordfreq[now_word][sense]+=1;
+			w->clusterembeddings[now_word][sense] -> Multi(1.0/((double)(w->wordfreq[now_word][sense])));
+		}
+		delete context;
+
+		//update the cluster embeddings
+		Embedding *e1 = w->senseembeddings[now_word][sense];
 		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
 			if (j!=w->window_size){
 				last_word = sentence_pos - w->window_size + j;
@@ -98,7 +146,7 @@ void* trainModelThread(void* id){
 				if (last_word==-1) continue;
 
 				//Embedding* e1 = w->senseembeddings[last_word][0];
-				Embedding* e1 = w->senseembeddings[now_word][0];
+				
 				//get the context embeddings
 				//choose the right sense
 				// update the cluster embeddings
@@ -140,7 +188,11 @@ void* trainModelThread(void* id){
 				//sense += work
 				e1->Saxpy((*work), 1.0);
 			}
+
+
+		}
 		sentence_pos++;
+
 		if (sentence_pos >= sentence_len){
 			sentence_len = 0;
 			continue;
@@ -155,7 +207,8 @@ void* trainModelThread(void* id){
 Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
-					int thread_number = 8, double subsampling = 1e-3){
+					int thread_number = 1, double subsampling = 1e-3,
+					double lambda = -0.1){
 
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
@@ -174,6 +227,8 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->table = NULL;
 	this->thread_number = thread_number;
 	this->subsampling = subsampling;
+	this->lambda = lambda;
+
 
 	this->v->buildVocab();
 	this->v->reduceVocab(this->min_count);
@@ -221,21 +276,21 @@ void Word2Vec::resetWeights(){
 	for (int i = 0; i < this->word_number; i++){
 		this->globalembeddings.push_back(new Embedding(this->layer1_size));
 		std::vector< Embedding* > v;
-		v.clear();v.push_back(new Embedding(this->layer1_size));
+		v.clear();//v.push_back(new Embedding(this->layer1_size));
 		this->senseembeddings.push_back(v);
 		std::vector<Embedding* > v1;
-		v1.clear();v1.push_back(new Embedding(this->layer1_size));
+		v1.clear();//v1.push_back(new Embedding(this->layer1_size));
 		this->clusterembeddings.push_back(v1);
 		std::vector<long long> v2;
-		v2.clear();v2.push_back(0);
+		v2.clear();//v2.push_back(0);
 		this->wordfreq.push_back(v2);
 		this->clusternumber.push_back(0);
 	}
 	//generate the random weights
 	for (int i = 0; i < this->word_number; i++){
 		this->globalembeddings[i]->randomGenerate(*(this->r));
-		this->clusterembeddings[i][0]->randomGenerate(*(this->r));
-		this->senseembeddings[i][0]->randomGenerate(*(this->r));
+		//this->clusterembeddings[i][0]->randomGenerate(*(this->r));
+		//this->senseembeddings[i][0]->randomGenerate(*(this->r));
 	}
 }
 
