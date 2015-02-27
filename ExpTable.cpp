@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-22 15:35:19
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-24 10:22:30
+* @Last Modified time: 2015-02-26 01:33:37
 */
 
 #include <iostream>
@@ -28,8 +28,7 @@ void ExpTable::init(){
 
 void ExpTable::show(){
 	for (int i = 0; i < this->max_table_size; i++)
-		std::cout << this->elem[i] << " ";
-	std::cout << std::endl;
+		printf("%lf\n", this->elem[i]);
 	fflush(stdout);
 }
 

@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 12:53:26
+* @Last Modified time: 2015-02-27 12:42:48
 */
 
 #include <iostream>
@@ -147,10 +147,11 @@ void HashMap::show(){
 }
 
 void HashMap::reduce_vocab(int min_count){
+	std::cout << "Reducing Vocab" << std::endl;
 	this->strlist.clear();
 	this->cntlist.clear();
 	for (int i = 0; i < this->hash_size; i++){
-		if (this->content[i].cnt != 0 && this->content[i].cnt > min_count){
+		if ((this->content[i].cnt != 0 && this->content[i].cnt > min_count) || ((this->content[i].word!=NULL) && (strcmp(this->content[i].word,"</s>")==0))){
 			this->strlist.push_back(std::string(this->content[i].word));
 			this->cntlist.push_back(this->content[i].cnt);
 		}
@@ -169,9 +170,11 @@ void HashMap::reduce_vocab(int min_count){
 	this->content = new Node[this->hash_size];
 	this->word_number = 0;
 	this->total_words = 0;
-	for (int i = 0; i < l; i++)
+	for (int i = 0; i < l; i++){
 		this->addWord(this->strlist[i].c_str(), this->cntlist[i]);
-
+	}
+	char ss[5]="</s>";
+	std::cout << "HERE : " << this->searchWordIndex(ss) << std::endl;
 	delete[] old_content;
 }
 

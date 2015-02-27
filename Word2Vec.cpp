@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-21 21:05:25
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-24 15:57:30
+* @Last Modified time: 2015-02-27 13:53:09
 */
 
 #include "pthread.h"
@@ -40,8 +40,9 @@ void* trainModelThread(void* id){
 	clock_t now;
 	clock_t  start = w->start;
 	long long sentence_len = 0, sentence_pos = 0, word_index;
-	char ss[5]= "<\\s>";
+	char ss[5]= "</s>";
 	long long skipline =  w->v->searchWord(ss);
+	//std::cout << skipline << std::endl;
 	long long now_word, last_word;
 	Embedding * work = new Embedding(w->layer1_size);
 	while (true){
@@ -83,10 +84,10 @@ void* trainModelThread(void* id){
 		}
 		if ((word_count >= total_words / w->thread_number) || (localf->hasWord()==false)) break;
 		now_word = sen[sentence_pos];
-		
+		if (now_word==-1) continue;
 		for (int i = 0; i < w->layer1_size; i++) (*work)[i] = 0.0;
 		int reduce_window = (localr->Next()) % w->window_size;
-		for (int j = reduce_window; j < reduce_window * 2 + 1 - reduce_window; j++)
+		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
 			if (j!=w->window_size){
 				last_word = sentence_pos - w->window_size + j;
 				if (last_word < 0 ) continue;
@@ -106,7 +107,6 @@ void* trainModelThread(void* id){
 					}else{
 						nextrandom = localr->Next();
 						target = (w->table)[(nextrandom >> 16) % (w->tablesize)];
-						if (target == 0) target = nextrandom % (w->word_number - 1) + 1;
 						if (target == now_word) continue;
 						label = 0;
 					}
@@ -126,6 +126,8 @@ void* trainModelThread(void* id){
 							g = (label - indexg) * alpha;
 						}
 					}
+					// printf("%llf, %llf\n", f, g);
+					// fflush(stdout);
 					//work+= g * global;
 					work->Saxpy((*e2), g);
 					//global += g * sense
@@ -133,6 +135,8 @@ void* trainModelThread(void* id){
 				}
 				//sense += work
 				e1->Saxpy((*work), 1.0);
+				// printf("%lf %lf\n",work->Norm(), e1->Norm());
+				// fflush(stdout);
 			}
 		sentence_pos++;
 		if (sentence_pos >= sentence_len){
@@ -147,8 +151,8 @@ void* trainModelThread(void* id){
 }
 
 Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
-					int window=5, int size=100, double alpha=0.25, 
-					double min_alpha=0.001, int negative = 15,
+					int window=5, int size=100, double alpha=0.025, 
+					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 8, double subsampling = 1e-3){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
@@ -248,6 +252,16 @@ void Word2Vec::inittable(){
 		}
 		if (i >= this->word_number) i = this->word_number -1;
 	}
+	// int lastnumber = 0, now = 0 ;
+	// for (int i = 0; i < this->tablesize; i++){
+	// 	if (lastnumber!=this->table[i]){
+	// 		std::cout << this->v->searchWordContent(lastnumber) << " " << now << std::endl;
+	// 		now = 0;
+	// 		lastnumber++;
+	// 	}
+	// 	now++;
+	// }
+	// std::cout << std::endl;
 }
 
 void Word2Vec::saveModel(const char* filename){

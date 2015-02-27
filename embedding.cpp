@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-17 23:37:15
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 22:58:30
+* @Last Modified time: 2015-02-27 11:23:34
 */
 
 #include "embedding.h"
@@ -70,6 +70,12 @@ double& Embedding::operator[](int index){
 // 	std::cout << e1->Dot(*e) << std::endl;
 // 	e1->randomGenerate(*r);
 // 	std::cout << e->similarity(*e1) << std::endl;
+// 	e1->randomGenerate(*r);
+// 	e->randomGenerate(*r);
+// 	e->show();
+// 	e1->show();
+// 	e1->Saxpy((*e), 0.5);
+// 	e1->show();
 // 	delete e;
 // 	delete e1;
 // 	delete r;

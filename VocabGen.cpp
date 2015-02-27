@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date:   2015-02-20 21:14:18
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-23 12:54:02
+* @Last Modified time: 2015-02-27 12:32:19
 */
 
 #include <iostream>
@@ -12,6 +12,7 @@
 VocabGen::VocabGen(const char* filename, int max_string):h(NULL),f(NULL), MAX_STRING(max_string){
 	this->f = new FileReader(filename, this->MAX_STRING, 0);
 	this->h = new HashMap();
+	this->h->addWord("</s>",1);
 }
 
 VocabGen::~VocabGen(){
