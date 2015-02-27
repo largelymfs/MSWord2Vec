@@ -1,6 +1,6 @@
-/* 
+/*
 * @Author: largelyfs
-* @Date:   2015-02-21 21:05:25
+* @Date: Fri Feb 27 21:53:51 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-02-27 17:58:46
 */
@@ -66,6 +66,7 @@ void* trainModelThread(void* id){
 				localf->getWord(buf);
 				word_index = w->v->searchWord(buf);
 				if (word_index==-1) continue;
+				if (word_index >= w->word_number) continue;
 				word_count++;
 				if (word_index==skipline) break;
 				//subsampling
@@ -87,7 +88,7 @@ void* trainModelThread(void* id){
 		if (now_word==-1) continue;
 		for (int i = 0; i < w->layer1_size; i++) (*work)[i] = 0.0;
 		int reduce_window = (localr->Next()) % w->window_size;
-		
+
 		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
 			if (j!=w->window_size){
 				last_word = sentence_pos - w->window_size + j;
@@ -99,7 +100,7 @@ void* trainModelThread(void* id){
 				//Embedding* e1 = w->senseembeddings[last_word][0];
 				Embedding* e1 = w->senseembeddings[now_word][0];
 				//get the context embeddings
-				//choose the right sense 
+				//choose the right sense
 				// update the cluster embeddings
 				for (int p = 0; p < w->layer1_size; p++) (*work)[p] = 0.0;
 				int label;
@@ -151,8 +152,8 @@ void* trainModelThread(void* id){
 	pthread_exit(NULL);
 }
 
-Word2Vec::Word2Vec(	const char* filename, int min_count=4, 
-					int window=5, int size=100, double alpha=0.025, 
+Word2Vec::Word2Vec(	const char* filename, int min_count=4,
+					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 8, double subsampling = 1e-3){
 
@@ -198,7 +199,7 @@ Word2Vec::~Word2Vec(){
 	li = this->senseembeddings.size();
 	for (int i = 0; i < li; i++){
 		lj = this->senseembeddings[i].size();
-		for (int j = 0; j < lj; j++) 
+		for (int j = 0; j < lj; j++)
 			if (this->senseembeddings[i][j] != NULL) delete this->senseembeddings[i][j];
 	}
 	li = this->clusterembeddings.size();
