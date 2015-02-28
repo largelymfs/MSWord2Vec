@@ -1,6 +1,6 @@
 /*
 * @Author: largelyfs
-* @Date: 五  2 27 23:07:16 2015 +0800
+* @Date: Sat Feb 28 13:13:52 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-02-28 01:58:12
 */
@@ -78,7 +78,7 @@ void* trainModelThread(void* id){
 				}
 				sen[sentence_len] = word_index;
 				sentence_len ++;
-				if (sentence_len > MAX_SENTENCE_LENGTH) break;
+				if (sentence_len >= MAX_SENTENCE_LENGTH) break;
 			}
 			sentence_pos = 0;
 		}
@@ -104,7 +104,6 @@ void* trainModelThread(void* id){
 			}
 		if (context_comp!=0){
 
-
 		context->Multi(1.0/(double)(context_comp));
 		int sense = 0;
 		double maxsimilarity = w->lambda;
@@ -116,7 +115,6 @@ void* trainModelThread(void* id){
 				maxsimilarity = tmp_similarity;
 			}
 		}
-		
 		if (maxsimilarity==w->lambda){
 			Embedding* newembeddings = new Embedding(w->layer1_size);
 			newembeddings->randomGenerate(*localr);
@@ -134,7 +132,6 @@ void* trainModelThread(void* id){
 			w->clusterembeddings[now_word][sense] -> Multi(1.0/((double)(w->wordfreq[now_word][sense])));
 		}
 		delete context;
-
 		//update the cluster embeddings
 		Embedding *e1 = w->senseembeddings[now_word][sense];
 		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
@@ -146,7 +143,7 @@ void* trainModelThread(void* id){
 				if (last_word==-1) continue;
 
 				//Embedding* e1 = w->senseembeddings[last_word][0];
-				
+
 				//get the context embeddings
 				//choose the right sense
 				// update the cluster embeddings
@@ -207,7 +204,7 @@ void* trainModelThread(void* id){
 Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
-					int thread_number = 1, double subsampling = 1e-3,
+					int thread_number = 8, double subsampling = 1e-3,
 					double lambda = -0.1){
 
 	this->filename = new char[MAX_STRING_LENGTH];
