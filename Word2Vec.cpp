@@ -1,6 +1,6 @@
 /*
 * @Author: largelyfs
-* @Date: 日  3 01 17:30:17 2015 +0800
+* @Date: Sun Mar 01 23:45:15 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-03-01 17:40:02
 */
@@ -43,7 +43,6 @@ void* trainModelThread(void* id){
 	long long sentence_len = 0, sentence_pos = 0, word_index;
 	char ss[5]= "</s>";
 	long long skipline =  w->v->searchWord(ss);
-	//std::cout << skipline << std::endl;
 	long long now_word, last_word;
 	Embedding * work = new Embedding(w->layer1_size);
 	while (true){
@@ -82,8 +81,8 @@ void* trainModelThread(void* id){
 			}
 			sentence_pos = 0;
 		}
-
 		if ((word_count >= total_words / w->thread_number) || (localf->hasWord()==false)) break;
+		if (sentence_len==0) continue;
 		now_word = sen[sentence_pos];
 		if (now_word==-1) continue;
 		for (int i = 0; i < w->layer1_size; i++) (*work)[i] = 0.0;
@@ -205,7 +204,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 8, double subsampling = 1e-3,
-					double lambda = -0.5){
+					double lambda = -0.1){
 
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
@@ -341,7 +340,8 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("text8",4);
+	Word2Vec *w = new Word2Vec("./test.txt",4);
+	printf("hello\n");fflush(stdout);
 	w->saveModel("output.txt");
 	delete w;
     return 0;

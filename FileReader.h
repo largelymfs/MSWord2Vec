@@ -16,6 +16,7 @@ private:
 	char* filename;
 	FILE* fin;
 	long long filesize;
+	int state;
 };
 
 #endif

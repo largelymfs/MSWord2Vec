@@ -1,6 +1,6 @@
-/* 
+/*
 * @Author: largelymfs
-* @Date:   2015-02-18 15:23:16
+* @Date: Sun Mar 01 22:18:12 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-02-23 11:26:56
 */
@@ -15,6 +15,7 @@ FileReader::FileReader(const char* filename, int max_string, long long starting_
 	strcpy(this->filename, filename);
 	this->fin = fopen(this->filename, "rb");
 	fseek(this->fin, starting_pos, SEEK_SET);
+	state = true;
 }
 FileReader::~FileReader(){
 	if (this->filename) delete[] this->filename;
@@ -44,9 +45,9 @@ bool FileReader::hasWord(){
 	if (feof(fin)){
 		this->filesize = ftell(fin);
 		fclose(fin);
-		return false;
+		state = false;
 	}
-	return true;
+	return state;
 }
 long long FileReader::fileSize(){
 	return this->filesize;
