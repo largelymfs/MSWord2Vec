@@ -1,8 +1,8 @@
 /*
 * @Author: largelyfs
-* @Date: Sat Feb 28 13:13:52 2015 +0800
+* @Date: 日  3 01 17:30:17 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-28 01:58:12
+* @Last Modified time: 2015-03-01 17:40:02
 */
 
 #include "pthread.h"
@@ -205,7 +205,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 8, double subsampling = 1e-3,
-					double lambda = -0.1){
+					double lambda = -0.5){
 
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
@@ -314,7 +314,7 @@ void Word2Vec::saveModel(const char* filename){
 	fo = fopen(filename,"wb");
 	fprintf(fo, "%lld %d\n", this->word_number, this->layer1_size);
 	for (int i = 0; i < this->word_number; i++){
-		fprintf(fo, "%s ", this->v->searchWordContent(i).c_str());
+		fprintf(fo, "%s %lu ", this->v->searchWordContent(i).c_str(), (this->senseembeddings[i]).size());
 		for (int j = 0; j < this->layer1_size; j++)
 			fprintf(fo,"%lf ", (*(this->globalembeddings[i]))[j]);
 		fprintf(fo, "\n");
