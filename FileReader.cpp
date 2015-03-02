@@ -1,10 +1,9 @@
 /*
-* @Author: largelymfs
-* @Date: Sun Mar 01 22:18:12 2015 +0800
+* @Date: Mon Mar 02 19:20:54 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-02-23 11:26:56
 */
-
+#include "stdio.h"
 #include <iostream>
 #include"FileReader.h"
 

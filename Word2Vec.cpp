@@ -1,6 +1,6 @@
 /*
 * @Author: largelyfs
-* @Date: Sun Mar 01 23:45:15 2015 +0800
+* @Date: Mon Mar 02 19:29:33 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-03-02 16:04:08
 */
@@ -108,6 +108,7 @@ void* trainModelThread(void* id){
 		int sense = 0;
 		double maxsimilarity = w->lambda;
 		//choose the right sense
+		pthread_mutex_lock(&m);
 		for (int i = 0; i < w->senseembeddings[now_word].size(); i++){
 			double tmp_similarity = context->similarity(*(w->clusterembeddings[now_word][i]));
 			if (tmp_similarity > maxsimilarity){
@@ -115,6 +116,7 @@ void* trainModelThread(void* id){
 				maxsimilarity = tmp_similarity;
 			}
 		}
+		pthread_mutex_unlock(&m);
 		if (maxsimilarity==w->lambda){
 			pthread_mutex_lock(&m);
 			Embedding* newembeddings = new Embedding(w->layer1_size);
@@ -137,7 +139,9 @@ void* trainModelThread(void* id){
 		}
 		delete context;
 		//update the cluster embeddings
+		pthread_mutex_lock(&m);
 		Embedding *e1 = w->senseembeddings[now_word][sense];
+		pthread_mutex_unlock(&m);
 		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
 			if (j!=w->window_size){
 				last_word = sentence_pos - w->window_size + j;
@@ -209,13 +213,13 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 20, double subsampling = 1e-3,
-					double lambda = -0.1){
-
+					double lambda = -0.5){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
 
 
 	this->v = new VocabGen(filename, MAX_STRING_LENGTH);
+
 	this->r = new RandomGen();
 	this->e = new ExpTable(EXPTABLE_MAX_TABLE_SIZE, EXPTABLE_MAX_EXP);
 	this->min_count = min_count;
@@ -345,8 +349,7 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("./test.txt",4);
-	printf("hello\n");fflush(stdout);
+	Word2Vec *w = new Word2Vec("./wiki.demo",9);
 	w->saveModel("output.txt");
 	delete w;
     return 0;
