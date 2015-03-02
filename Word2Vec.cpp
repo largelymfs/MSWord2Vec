@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date: Sun Mar 01 23:45:15 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-03-01 17:40:02
+* @Last Modified time: 2015-03-02 16:04:08
 */
 
 #include "pthread.h"
@@ -16,6 +16,7 @@
 #define EXPTABLE_MAX_EXP 6
 #define MAX_SENTENCE_LENGTH 1000
 
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
 using namespace std;
 #include "Word2Vec.h"
@@ -115,6 +116,7 @@ void* trainModelThread(void* id){
 			}
 		}
 		if (maxsimilarity==w->lambda){
+			pthread_mutex_lock(&m);
 			Embedding* newembeddings = new Embedding(w->layer1_size);
 			newembeddings->randomGenerate(*localr);
 			w->senseembeddings[now_word].push_back(newembeddings);
@@ -124,11 +126,14 @@ void* trainModelThread(void* id){
 			w->clusterembeddings[now_word].push_back(newembeddings);
 			w->wordfreq[now_word].push_back(1);
 			sense = w->clusterembeddings[now_word].size()-1;
+			pthread_mutex_unlock(&m);
 		}else{
+			pthread_mutex_lock(&m);
 			w->clusterembeddings[now_word][sense] -> Multi((double)(w->wordfreq[now_word][sense]));
 			w->clusterembeddings[now_word][sense] -> Saxpy((*context), 1.0);
 			w->wordfreq[now_word][sense]+=1;
 			w->clusterembeddings[now_word][sense] -> Multi(1.0/((double)(w->wordfreq[now_word][sense])));
+			pthread_mutex_unlock(&m);
 		}
 		delete context;
 		//update the cluster embeddings
@@ -203,7 +208,7 @@ void* trainModelThread(void* id){
 Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
-					int thread_number = 8, double subsampling = 1e-3,
+					int thread_number = 20, double subsampling = 1e-3,
 					double lambda = -0.1){
 
 	this->filename = new char[MAX_STRING_LENGTH];
