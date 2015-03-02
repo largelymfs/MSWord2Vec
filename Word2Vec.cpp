@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date: Mon Mar 02 19:29:33 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-03-02 16:04:08
+* @Last Modified time: 2015-03-02 19:44:11
 */
 
 #include "pthread.h"
@@ -108,7 +108,7 @@ void* trainModelThread(void* id){
 		int sense = 0;
 		double maxsimilarity = w->lambda;
 		//choose the right sense
-		pthread_mutex_lock(&m);
+		pthread_mutex_lock(&(w->mutex[now_word]));
 		for (int i = 0; i < w->senseembeddings[now_word].size(); i++){
 			double tmp_similarity = context->similarity(*(w->clusterembeddings[now_word][i]));
 			if (tmp_similarity > maxsimilarity){
@@ -116,9 +116,9 @@ void* trainModelThread(void* id){
 				maxsimilarity = tmp_similarity;
 			}
 		}
-		pthread_mutex_unlock(&m);
+		pthread_mutex_unlock(&(w->mutex[now_word]));
 		if (maxsimilarity==w->lambda){
-			pthread_mutex_lock(&m);
+			pthread_mutex_lock(&(w->mutex[now_word]));
 			Embedding* newembeddings = new Embedding(w->layer1_size);
 			newembeddings->randomGenerate(*localr);
 			w->senseembeddings[now_word].push_back(newembeddings);
@@ -128,20 +128,20 @@ void* trainModelThread(void* id){
 			w->clusterembeddings[now_word].push_back(newembeddings);
 			w->wordfreq[now_word].push_back(1);
 			sense = w->clusterembeddings[now_word].size()-1;
-			pthread_mutex_unlock(&m);
+			pthread_mutex_unlock(&(w->mutex[now_word]));
 		}else{
-			pthread_mutex_lock(&m);
+			pthread_mutex_lock(&(w->mutex[now_word]));
 			w->clusterembeddings[now_word][sense] -> Multi((double)(w->wordfreq[now_word][sense]));
 			w->clusterembeddings[now_word][sense] -> Saxpy((*context), 1.0);
 			w->wordfreq[now_word][sense]+=1;
 			w->clusterembeddings[now_word][sense] -> Multi(1.0/((double)(w->wordfreq[now_word][sense])));
-			pthread_mutex_unlock(&m);
+			pthread_mutex_unlock(&(w->mutex[now_word]));
 		}
 		delete context;
 		//update the cluster embeddings
-		pthread_mutex_lock(&m);
+		pthread_mutex_lock(&(w->mutex[now_word]));
 		Embedding *e1 = w->senseembeddings[now_word][sense];
-		pthread_mutex_unlock(&m);
+		pthread_mutex_unlock(&(w->mutex[now_word]));
 		for (int j = reduce_window; j < w->window_size * 2 + 1 - reduce_window; j++)
 			if (j!=w->window_size){
 				last_word = sentence_pos - w->window_size + j;
@@ -239,6 +239,9 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->v->reduceVocab(this->min_count);
 	this->filesize = this->v->fileSize();
 	this->word_number = this->v->size();
+	this->mutex = new pthread_mutex_t[this->word_number];
+	for (int i = 0; i < this->word_number; i++)
+		pthread_mutex_init(&(this->mutex[i]), NULL);
 	this->total_words = this->v->totalWords();
 	this->start = clock();
 	this->resetWeights();
@@ -251,6 +254,10 @@ Word2Vec::~Word2Vec(){
 	if (v!=NULL) delete v;
 	if (r!=NULL) delete r;
 	if (e!=NULL) delete e;
+	for (int i = 0; i < this->word_number; i++)
+		pthread_mutex_destroy(&(this->mutex[i]));
+	delete this->mutex;
+
 	if (this->table!=NULL) delete this->table;
 	int l = this->globalembeddings.size();
 	for (int i = 0; i < l; i++)
@@ -268,6 +275,7 @@ Word2Vec::~Word2Vec(){
 		for (int j = 0; j < lj; j++)
 			if (this->clusterembeddings[i][j] != NULL) delete this->clusterembeddings[i][j];
 	}
+
 	this->clusternumber.clear();
 	this->wordfreq.clear();
 }
@@ -349,7 +357,7 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("./wiki.demo",9);
+	Word2Vec *w = new Word2Vec("./test.txt",9);
 	w->saveModel("output.txt");
 	delete w;
     return 0;

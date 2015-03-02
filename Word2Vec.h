@@ -40,6 +40,7 @@ private:
 	std::vector< std::vector<Embedding*> > clusterembeddings;
 	std::vector< int > clusternumber;
 	std::vector< std::vector<long long> > wordfreq;
+	pthread_mutex_t *mutex;
 };
 
 #endif
