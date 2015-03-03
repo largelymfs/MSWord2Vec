@@ -2,7 +2,7 @@
 * @Author: largelymfs
 * @Date:   2015-02-18 11:15:37
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-02-27 17:54:39
+* @Last Modified time: 2015-03-03 16:45:29
 */
 
 #include <iostream>
@@ -88,6 +88,7 @@ long long HashMap::searchWord( char *word){
 }
 long long HashMap::searchWordIndex( char* word){
 	long long res = this->searchWord(word);
+	if (res==-1) return -1;								//!!!A BUG FIXED!!!
 	return this->content[res].index;
 }
 void HashMap::addWord( char *word, int cnt){
