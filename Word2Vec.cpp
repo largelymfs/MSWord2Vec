@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date: Mon Mar 02 19:57:09 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-03-03 17:10:08
+* @Last Modified time: 2015-03-04 22:16:59
 */
 
 #include "pthread.h"
@@ -233,6 +233,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->thread_number = thread_number;
 	this->subsampling = subsampling;
 	this->lambda = lambda;
+	this->word_counts_actual = 0;
 
 
 	this->v->buildVocab();
