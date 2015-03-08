@@ -1,6 +1,6 @@
 /*
 * @Author: largelyfs
-* @Date: Mon Mar 02 19:57:09 2015 +0800
+* @Date: Sun Mar 08 22:43:23 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-03-04 22:16:59
 */
@@ -212,7 +212,7 @@ void* trainModelThread(void* id){
 Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=100, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
-					int thread_number = 1, double subsampling = 1e-3,
+					int thread_number = 20, double subsampling = 1e-3,
 					double lambda = 0.1){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
@@ -359,7 +359,7 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	Word2Vec *w = new Word2Vec("./test.txt",9);
+	Word2Vec *w = new Word2Vec("./wiki_origin.txt.stem.document",19);
 	w->saveModel("output.txt");
 	printf("\nFinish!\n");fflush(stdout);
 	delete w;

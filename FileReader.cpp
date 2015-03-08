@@ -1,5 +1,5 @@
 /*
-* @Date: Mon Mar 02 19:20:54 2015 +0800
+* @Date: Sun Mar 08 22:32:59 2015 +0800
 * @Last Modified by:   largelyfs
 * @Last Modified time: 2015-02-23 11:26:56
 */
@@ -17,6 +17,7 @@ FileReader::FileReader(const char* filename, int max_string, long long starting_
 	state = true;
 }
 FileReader::~FileReader(){
+	fclose(this->fin);
 	if (this->filename) delete[] this->filename;
 }
 void FileReader::getWord(char* word){
@@ -43,7 +44,7 @@ void FileReader::getWord(char* word){
 bool FileReader::hasWord(){
 	if (feof(fin)){
 		this->filesize = ftell(fin);
-		fclose(fin);
+//		fclose(fin);
 		state = false;
 	}
 	return state;
