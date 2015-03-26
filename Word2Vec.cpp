@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date: Thu Mar 26 12:22:44 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-03-26 10:52:01
+* @Last Modified time: 2015-03-26 23:16:36
 */
 
 #include "pthread.h"
@@ -39,6 +39,8 @@ void* trainModelThread(void* id){
 	double alpha = w->alpha;
 	double min_alpha = w->min_alpha;
 	long long total_words = w->total_words;
+	long long total_train_words = w->total_train_words;
+
 	clock_t now;
 	clock_t  start = w->start;
 	long long sentence_len = 0, sentence_pos = 0, word_index;
@@ -46,16 +48,19 @@ void* trainModelThread(void* id){
 	long long skipline =  w->v->searchWord(ss);
 	long long now_word, last_word;
 	Embedding * work = new Embedding(w->layer1_size);
+
+	int local_iter = w->iteration;
+
 	while (true){
 		if (word_count - last_word_count > 10000){
 			w->word_counts_actual += word_count - last_word_count;
 			last_word_count = word_count;
 			now = clock();
 			printf("%cAlpha: %f  Progress: %.2f%%  Words/thread/sec: %.2fk  ", 13, alpha,
-         	w->word_counts_actual / (double)(w->total_words + 1) * 100,
+         	w->word_counts_actual / (double)(total_train_words + 1) * 100,
          	w->word_counts_actual / ((double)(now - start + 1) / (double)CLOCKS_PER_SEC * 1000));
 			fflush(stdout);
-			alpha = w->alpha * (1- w->word_counts_actual / (double)(total_words+1));
+			alpha = w->alpha * (1- w->word_counts_actual / (double)(total_train_words+1));
 			if (alpha < min_alpha) alpha = min_alpha;
 		}
 
@@ -82,7 +87,19 @@ void* trainModelThread(void* id){
 			}
 			sentence_pos = 0;
 		}
-		if ((word_count >= total_words / w->thread_number) || (localf->hasWord()==false)) break;
+
+		if ((word_count >= total_words / w->thread_number) || (localf->hasWord()==false)){
+			w->word_counts_actual += (word_count - last_word_count);
+			local_iter--;
+			if (local_iter == 0) break;
+			word_count = 0;
+			last_word_count = 0;
+			sentence_len = 0;
+			delete localf;
+			localf = new FileReader(w->filename, MAX_STRING_LENGTH, w->filesize / (long long)(w->thread_number) * data->id);
+			continue;
+		}
+
 		if (sentence_len==0) continue;
 		now_word = sen[sentence_pos];
 		if (now_word==-1) continue;
@@ -213,7 +230,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 					int window=5, int size=200, double alpha=0.025,
 					double min_alpha=0.001 * 0.025, int negative = 15,
 					int thread_number = 20, double subsampling = 1e-3,
-					double lambda = -0.5){
+					double lambda = 0.1, int iteration = 5){
 	this->filename = new char[MAX_STRING_LENGTH];
 	strcpy(this->filename, filename);
 
@@ -234,6 +251,7 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	this->subsampling = subsampling;
 	this->lambda = lambda;
 	this->word_counts_actual = 0;
+	this->iteration = iteration;
 
 
 	this->v->buildVocab();
@@ -244,6 +262,8 @@ Word2Vec::Word2Vec(	const char* filename, int min_count=4,
 	for (int i = 0; i < this->word_number; i++)
 		pthread_mutex_init(&(this->mutex[i]), NULL);
 	this->total_words = this->v->totalWords();
+	this->total_train_words = this->v->totalWords() * this->iteration;
+
 	this->start = clock();
 	this->resetWeights();
 	this->inittable();
@@ -374,8 +394,8 @@ void Word2Vec::trainModel(){
 
 
 int main(){
-	//Word2Vec *w = new Word2Vec("./wiki_origin.txt.stem.document",19);
-	Word2Vec *w = new Word2Vec("./../train.data.split");
+	Word2Vec *w = new Word2Vec("test.txt");
+	//Word2Vec *w = new Word2Vec("./../train.data.split");
 	w->saveEmbeddingModel("vector.txt");
 	w->saveClusterModel("cluster.txt");
 	printf("\nFinish!\n");fflush(stdout);
