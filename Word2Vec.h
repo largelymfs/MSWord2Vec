@@ -19,7 +19,8 @@ public:
 				double lambda);
 	void resetWeights();								// reset the weights
 	void inittable();									// sample table
-	void saveModel(const char* filename);				// output to the file
+	void saveClusterModel(const char* filename);				// output to the file
+	void saveEmbeddingModel(const char* filename);
 	void trainModel();									// train 
 
 	friend void* trainModelThread(void *id);			// thread to train the whole model

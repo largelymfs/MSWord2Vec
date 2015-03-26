@@ -2,7 +2,7 @@
 * @Author: largelyfs
 * @Date: Sun Mar 08 22:43:23 2015 +0800
 * @Last Modified by:   largelyfs
-* @Last Modified time: 2015-03-04 22:16:59
+* @Last Modified time: 2015-03-26 10:52:01
 */
 
 #include "pthread.h"
@@ -326,7 +326,7 @@ void Word2Vec::inittable(){
 	}
 }
 
-void Word2Vec::saveModel(const char* filename){
+void Word2Vec::saveEmbeddingModel(const char* filename){
 	FILE *fo;
 	fo = fopen(filename,"wb");
 	fprintf(fo, "%lld %d\n", this->word_number, this->layer1_size);
@@ -338,6 +338,21 @@ void Word2Vec::saveModel(const char* filename){
 		for (int num = 0; num < this->clusterembeddings[i].size(); num++){
 			for (int j = 0; j< this->layer1_size; j++)
 				fprintf(fo, "%lf ", (*(this->senseembeddings[i][num]))[j]);
+			fprintf(fo, "\n");
+		}
+	}
+	fclose(fo);
+}
+
+void Word2Vec::saveClusterModel(const char* filename){
+	FILE *fo;
+	fo = fopen(filename,"wb");
+	fprintf(fo, "%lld %d\n", this->word_number, this->layer1_size);
+	for (int i = 0; i < this->word_number; i++){
+		fprintf(fo, "%s %lu\n ", this->v->searchWordContent(i).c_str(), (this->senseembeddings[i]).size());
+		for (int num = 0; num < this->clusterembeddings[i].size(); num++){
+			for (int j = 0; j < this->layer1_size; j++)
+				fprintf(fo, "%lf ", (*(this->clusterembeddings[i][num]))[j]);
 			fprintf(fo, "\n");
 		}
 	}
@@ -360,7 +375,8 @@ void Word2Vec::trainModel(){
 
 int main(){
 	Word2Vec *w = new Word2Vec("./wiki_origin.txt.stem.document",19);
-	w->saveModel("output.txt");
+	w->saveEmbeddingModel("vector.txt");
+	w->saveClusterModel("cluster.txt");
 	printf("\nFinish!\n");fflush(stdout);
 	delete w;
     return 0;
