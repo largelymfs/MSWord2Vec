@@ -3,7 +3,7 @@
 # @Author: largelymfs
 # @Date: Thu Mar 26 13:10:57 2015 +0800
 # @Last Modified by:   largelyfs
-# @Last Modified time: 2015-03-01 18:36:55
+# @Last Modified time: 2015-03-26 15:03:43
 
 import numpy as np
 import sys
@@ -63,6 +63,14 @@ class Model:
 		print "============================================================"
 
 	def show(self):
+		
+		total_times = 0.0
+		total_cnt = 0.0
+		for word in self.senseembeddings:
+			total_cnt += 1.0
+			total_times += len(self.senseembeddings[word])
+		print "AVER SENSES : ", float(total_times) / float(total_cnt)
+
 		while True:
 			word = raw_input("Please input the word : ")
 			if word=='EXIT':
