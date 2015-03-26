@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: largelymfs
-# @Date:   2015-03-01 17:32:13
+# @Date: Thu Mar 26 13:10:57 2015 +0800
 # @Last Modified by:   largelyfs
 # @Last Modified time: 2015-03-01 18:36:55
 
@@ -74,7 +74,7 @@ class Model:
 
 if __name__ == '__main__':
 
-	m = Model("output.txt")
+	m = Model("vector.txt")
 	m.show()
 
 
