@@ -1,11 +1,17 @@
 # -*- coding:utf-8-*-
-
+import random
 import numpy as np
 import sys
 import numpy.linalg as LA
 
 def convert2np(raw_string):
     return np.array([float(item) for item in raw_string.split()])
+
+def similarity(emb1, emb2):
+    try:
+        return np.dot(emb1, emb2) / (LA.norm(emb1) * LA.norm(emb2))
+    except:
+        return 0.0
 
 class MSWord2Vec:
     def __init__(self, vector_fn, cluster_fn, freq_fn):
@@ -27,9 +33,9 @@ class MSWord2Vec:
         self.global_vectors = {}
         with open(filename) as fin:
             vocab_size, layer_size = fin.readline().strip().split()
-            vocab_size = int(vocab_size)
-            layer_size = int(layer_size)
-            for _ in range(vocab_size):
+            self.vocab_size = int(vocab_size)
+            self.layer_size = int(layer_size)
+            for _ in range(self.vocab_size):
                 words = fin.readline().strip().split()
                 word = words[0]
                 sense_number = int(words[1])
@@ -82,8 +88,46 @@ class MSWord2Vec:
             result.append(self.compute_kNN_one_sense(word1, sense, k))
         return result
 
+    def infer_corpus(self, input_filename, output_filename, max_windows = 5):
+        with open(input_filename) as fin, open(output_filename,"w") as fout:
+            for l in fin:
+                words = l.strip().split()
+                length = len(words)
+                for (pos, word) in enumerate(words):
+                    window = random.randint(1, max_windows)
+                    start = max(0, pos - window)
+                    finish = min(pos + window + 1, length)
+                    cnt = 0.0
+                    context = np.zeros(self.layer_size)
+                    if word not in self.cluster:
+                        continue
 
-if __name__=="__main__":
+                    for my_pos in range(start, finish):
+                        if my_pos==pos:
+                            continue
+                        word_item = words[my_pos]
+                        if word_item not in self.global_vectors:
+                            continue
+                        else:
+                            context = context + self.global_vectors[word_item]
+                            cnt += 1.0
+
+                    if cnt==0.0:
+                        print >>fout, word, 0,
+                    else:
+                        max_distance = 0.0
+                        my_label = 0
+                        context = context * (1.0/float(cnt))
+                        for (sense_number, cluster_vector) in enumerate(self.cluster[word]):
+                            distance = similarity(context, cluster_vector)
+                            if distance > max_distance:
+                                max_distance = distance
+                                my_label = sense_number
+                        print >>fout, word, my_label,
+                print >>fout
+
+
+def check_main():
     #model = MSWord2Vec("./../Data/vector_rmrb-0.1.txt", "./../Data/cluster_rmrb-0.1.txt")
     model = MSWord2Vec("./../vector_rmrb-0.1.txt", "./../cluster_rmrb-0.1.txt", "./../freq_lite.txt")
     #model = MSWord2Vec("./../vector.demo","./../cluster.demo", "./../freq_lite.txt")
@@ -99,3 +143,7 @@ if __name__=="__main__":
                 print word, similarity
             print "================================================="
 
+
+if __name__=="__main__":
+    model = MSWord2Vec("./../vector_rmrb-0.1.txt", "./../cluster_rmrb-0.1.txt","./../freq_lite.txt")
+    model.infer_corpus("./../rmrb.demo","./../sense_infer")
