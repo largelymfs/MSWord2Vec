@@ -12,9 +12,9 @@ class MSWord2Vec:
         print "load vectors..."
         sys.stdout.flush()
         self.load_vectors(vector_fn)
-        #print "load cluster..."
-        #sys.stdout.flush()
-        #self.load_vectors(cluster_fn)
+        print "load cluster..."
+        sys.stdout.flush()
+        self.load_cluster(cluster_fn)
         print "load freq..."
         sys.stdout.flush()
         self.load_wordmap(freq_fn)
@@ -84,13 +84,18 @@ class MSWord2Vec:
 
 
 if __name__=="__main__":
-    model = MSWord2Vec("./../Data/vector_rmrb-0.1.txt", "./../Data/cluster_rmrb-0.1.txt")
-
+    #model = MSWord2Vec("./../Data/vector_rmrb-0.1.txt", "./../Data/cluster_rmrb-0.1.txt")
+    model = MSWord2Vec("./../vector_rmrb-0.1.txt", "./../cluster_rmrb-0.1.txt", "./../freq_lite.txt")
+    #model = MSWord2Vec("./../vector.demo","./../cluster.demo", "./../freq_lite.txt")
     while True:
         word = raw_input("Please Input a word : ")
         print word, type(word)
         if word=='EXIT':
             break
-        print model.compute_kNN(word, 10)
-
+        result = model.compute_kNN(word, 10)
+        for result_item in result:
+            print "================================================="
+            for (word, sense, similarity) in result_item:
+                print word, similarity
+            print "================================================="
 
