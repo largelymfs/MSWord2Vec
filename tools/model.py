@@ -89,8 +89,15 @@ class MSWord2Vec:
         return result
 
     def infer_corpus(self, input_filename, output_filename, max_windows = 5):
+        block_number = 0
+        local_number = 0
         with open(input_filename) as fin, open(output_filename,"w") as fout:
             for l in fin:
+                local_number +=1
+                if (local_number == 1000):
+                    block_number +=1
+                    local_number = 0
+                    print "LINE NUMBER : ", block_number , "K"
                 words = l.strip().split()
                 length = len(words)
                 for (pos, word) in enumerate(words):
@@ -146,4 +153,4 @@ def check_main():
 
 if __name__=="__main__":
     model = MSWord2Vec("./../vector_rmrb-0.1.txt", "./../cluster_rmrb-0.1.txt","./../freq_lite.txt")
-    model.infer_corpus("./../rmrb.demo","./../sense_infer")
+    model.infer_corpus("./../../rmrb.data","./../../rmrb.sense")
